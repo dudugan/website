@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en" data-page="{{slug}}" data-base="{{base}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{title}}</title>
+  <meta name="description" content="{{description}}">
+  <meta name="theme-color" content="#000000">
+  <meta property="og:title" content="{{title}}">
+  <meta property="og:description" content="{{description}}">
+  <link rel="icon" href="{{base}}/favicon.ico" sizes="32x32">
+  <link rel="icon" href="{{base}}/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{{base}}/apple-touch-icon.png">
+  <link rel="manifest" href="{{base}}/site.webmanifest">
+  <link rel="preload" href="{{base}}/fonts/eb-garamond-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="{{base}}/assets/site.css?v={{v}}">
+  <script>
+    // Runs before first paint: the loader only shows on the first page of a visit.
+    (function (d) {
+      d.classList.add('js');
+      try {
+        if (!sessionStorage.getItem('seen-loader') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          d.classList.add('loading');
+        }
+      } catch (e) {}
+    })(document.documentElement);
+  </script>
+  <script type="module" src="{{base}}/assets/js/main.js?v={{v}}"></script>
+</head>
+<body>
+  <div id="loader" aria-hidden="true">{{loader}}</div>
+
+  <div id="page">
+    <header>
+      <a class="name" href="{{base}}/">{{name}}</a>
+      <nav aria-label="pages">{{nav}}</nav>
+    </header>
+    <main id="content" tabindex="-1">
+{{content}}
+    </main>
+    <footer>
+      <ul class="links">{{links}}</ul>
+    </footer>
+  </div>
+
+  <button id="sound" type="button" hidden aria-pressed="false" aria-label="play music">
+    <span class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    <span class="state">not playing</span>
+  </button>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "Lorem Ipsum",
+  "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+  "nav": ["now", "past-lives", "influences"],
+  "links": [
+    { "label": "old site", "url": "https://example.com/old-site" },
+    { "label": "linkedin", "url": "https://example.com/linkedin" },
+    { "label": "newsletter", "url": "https://example.com/newsletter" },
+    { "label": "ai safety", "url": "https://example.com/ai-safety-substack" },
+    { "label": "resume", "url": "https://example.com/resume.pdf" }
+  ]
+}
