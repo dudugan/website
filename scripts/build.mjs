@@ -5,6 +5,14 @@
 //   content/now.md         -> dist/now.html          served at /now
 //   content/past-lives.md  -> dist/past-lives.html   served at /past-lives
 //
+// Posts live in content/writings/, named YYYY-MM-DD-slug.md. Each one's first `# heading` is
+// its title. /writings lists them newest first:
+//
+//   content/writings/2026-09-26-hello-world.md -> dist/writings/hello-world.html  at /writings/hello-world
+//   (the list)                                 -> dist/writings/index.html        at /writings
+//
+// A line `<!-- habits -->` in any page becomes the habit tracker, drawn from content/habits.json.
+//
 // BASE_PATH (e.g. "/website") prefixes every internal URL, for hosting under a sub-path.
 
 import { createHash } from 'node:crypto';
@@ -12,6 +20,8 @@ import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { Marked } from 'marked';
+import { IMAGE_DIR, imageSlug } from './images.mjs';
+import { localToday, parseHabits, trackerFigure } from '../src/js/habits.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const at = (...p) => join(root, ...p);
@@ -20,6 +30,21 @@ const escapeHtml = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
 const labelFor = (slug) => slug.replace(/-/g, ' ');
+
+async function readPosts(marked) {
+  const dir = at('content/writings');
+  const files = (await readdir(dir).catch(() => [])).filter((f) => f.endsWith('.md'));
+  const posts = [];
+  for (const file of files) {
+    const match = file.match(/^(\d{4})-(\d{2})-(\d{2})-(.+)\.md$/);
+    if (!match) throw new Error(`content/writings/${file}: name posts YYYY-MM-DD-slug.md`);
+    const [, y, m, d, slug] = match;
+    const md = await readFile(join(dir, file), 'utf8');
+    const heading = marked.lexer(md).find((t) => t.type === 'heading' && t.depth === 1);
+    posts.push({ slug, md, title: heading ? heading.text : labelFor(slug), iso: `${y}-${m}-${d}`, shown: `${+d}/${+m}/${y}` });
+  }
+  return posts.sort((a, b) => b.iso.localeCompare(a.iso));
+}
 
 // Fail loudly if a second HTML file ever appears in the source: one template renders every page.
 async function assertSingleTemplate() {
@@ -38,7 +63,7 @@ async function assertSingleTemplate() {
   if (extra.length) throw new Error(`Only src/layout.html may exist as HTML source. Found: ${extra.join(', ')}`);
 }
 
-function markdownRenderer(base) {
+function markdownRenderer(base, linkImages) {
   const marked = new Marked({ gfm: true });
   const local = (href) => (href.startsWith('/') && !href.startsWith('//') ? base + href : href);
   marked.use({
@@ -46,10 +71,12 @@ function markdownRenderer(base) {
       link({ href, title, tokens }) {
         const text = this.parser.parseInline(tokens);
         const external = /^https?:\/\//.test(href);
+        const image = external && linkImages.has(`${imageSlug(href)}.jpg`) ? `${base}/img/links/${imageSlug(href)}.jpg` : '';
         const attrs = [
           `href="${escapeHtml(local(href))}"`,
           title ? `title="${escapeHtml(title)}"` : '',
           external ? 'target="_blank" rel="noopener"' : '',
+          image ? `data-img="${escapeHtml(image)}"` : '',
         ].filter(Boolean);
         return `<a ${attrs.join(' ')}>${text}</a>`;
       },
@@ -70,7 +97,9 @@ export async function build({ base = process.env.BASE_PATH ?? '', quiet = false 
   const config = JSON.parse(await readFile(at('site.config.json'), 'utf8'));
   const layout = await readFile(at('src/layout.html'), 'utf8');
   const { default: procession } = await import(pathToFileURL(at('src/art/procession.mjs')).href + `?t=${Date.now()}`);
-  const marked = markdownRenderer(base);
+  // Links whose image `npm run images` has fetched get data-img, which the collage picks up.
+  const linkImages = new Set(await readdir(IMAGE_DIR).catch(() => []));
+  const marked = markdownRenderer(base, linkImages);
 
   await rm(at('dist'), { recursive: true, force: true });
   await mkdir(at('dist/assets/js'), { recursive: true });
@@ -102,7 +131,11 @@ export async function build({ base = process.env.BASE_PATH ?? '', quiet = false 
   // Shared chrome: nav + external links.
   const navHtml = (slug) =>
     config.nav
-      .map((s) => `<a href="${base}/${s}"${s === slug ? ' aria-current="page"' : ''}>${escapeHtml(labelFor(s))}</a>`)
+      .map((s) => {
+        // A post marks its section (writings) as current too.
+        const current = s === slug ? ' aria-current="page"' : slug.startsWith(`${s}/`) ? ' aria-current="true"' : '';
+        return `<a href="${base}/${s}"${current}>${escapeHtml(labelFor(s))}</a>`;
+      })
       .join('');
   const linksHtml = config.links
     .map((l) => `<li><a href="${escapeHtml(l.url)}" target="_blank" rel="noopener">${escapeHtml(l.label)}</a></li>`)
@@ -126,13 +159,42 @@ export async function build({ base = process.env.BASE_PATH ?? '', quiet = false 
       return values[key];
     });
 
+  const habitsText = await readFile(at('content/habits.json'), 'utf8').catch(() => null);
+  const habits = habitsText && parseHabits(habitsText);
+  const remote = { repo: config.repo, branch: 'main', file: 'content/habits.json' };
+  const parse = (md, where) => {
+    const html = marked.parse(md);
+    if (!html.includes('<!-- habits -->')) return html;
+    if (!habits) throw new Error(`${where} asks for <!-- habits --> but content/habits.json is missing`);
+    return html.replace('<!-- habits -->', trackerFigure(habits, localToday(), remote));
+  };
+
   const pages = (await readdir(at('content'))).filter((f) => f.endsWith('.md')).sort();
   for (const file of pages) {
     const slug = file.replace(/\.md$/, '');
     const md = await readFile(at('content', file), 'utf8');
     const heading = marked.lexer(md).find((t) => t.type === 'heading' && t.depth === 1);
     const title = slug === 'index' ? config.name : `${heading ? heading.text : labelFor(slug)} — ${config.name}`;
-    await writeFile(at('dist', `${slug}.html`), render({ slug, title, content: marked.parse(md) }));
+    await writeFile(at('dist', `${slug}.html`), render({ slug, title, content: parse(md, `content/${file}`) }));
+  }
+
+  const posts = await readPosts(marked);
+  if (posts.length) {
+    await mkdir(at('dist/writings'), { recursive: true });
+    for (const post of posts) {
+      const date = `<p class="post-date"><time datetime="${post.iso}">${post.shown}</time></p>`;
+      const body = parse(post.md, `content/writings/${post.slug}`);
+      const content = body.includes('</h1>') ? body.replace('</h1>', `</h1>\n${date}`) : date + body;
+      const title = `${post.title} — ${config.name}`;
+      await writeFile(at('dist/writings', `${post.slug}.html`), render({ slug: `writings/${post.slug}`, title, content }));
+    }
+    const list = posts
+      .map((p) => `<li><a href="${base}/writings/${p.slug}">${marked.parseInline(p.title)}</a> <time datetime="${p.iso}">${p.shown}</time></li>`)
+      .join('\n');
+    await writeFile(
+      at('dist/writings/index.html'),
+      render({ slug: 'writings', title: `writings — ${config.name}`, content: `<ul class="posts">\n${list}\n</ul>` }),
+    );
   }
 
   // 404 page, from the same template.
@@ -147,7 +209,8 @@ export async function build({ base = process.env.BASE_PATH ?? '', quiet = false 
 
   if (!quiet) {
     const ms = Math.round(performance.now() - started);
-    console.log(`built ${pages.length} pages + 404 → dist/ in ${ms} ms${base ? ` (base ${base})` : ''}`);
+    const extra = posts.length ? ` + ${posts.length} posts` : '';
+    console.log(`built ${pages.length} pages${extra} + 404 → dist/ in ${ms} ms${base ? ` (base ${base})` : ''}`);
   }
 }
 

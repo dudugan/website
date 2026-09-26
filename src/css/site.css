@@ -62,6 +62,7 @@ html {
 }
 
 body {
+  position: relative;
   margin: 0;
   background: var(--bg);
 }
@@ -92,6 +93,8 @@ main:focus {
 
 /* ---------- page: one narrow column, centred when short (after nel.ag) ---------- */
 #page {
+  position: relative;
+  z-index: 1;
   width: min(31rem, 100% - 32px);
   min-height: 100vh;
   min-height: 100svh;
@@ -126,10 +129,10 @@ header nav a {
   text-decoration: none;
 }
 header nav a:hover,
-header nav a[aria-current='page'] {
+header nav a[aria-current] {
   color: var(--fg);
 }
-header nav a[aria-current='page'] {
+header nav a[aria-current] {
   text-decoration: underline;
   text-decoration-color: var(--muted);
 }
@@ -191,16 +194,16 @@ main code {
 }
 main strong {
   font-weight: 600;
-  background: linear-gradient(100deg, #ffb35f, #ff7a3d, #ffe3b0, #ff934a, #ffb35f);
+  background: linear-gradient(100deg, #178f86, #0e6b67, #5cc9bd, #1f9e93, #178f86);
   background-size: 250% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  animation: embers 6s ease-in-out infinite;
+  animation: shimmer 6s ease-in-out infinite;
 }
 
-@keyframes embers {
+@keyframes shimmer {
   0%,
   100% {
     background-position: 0% 50%;
@@ -208,6 +211,125 @@ main strong {
   50% {
     background-position: 100% 50%;
   }
+}
+
+/* ---------- writings: the list of posts, and each post's date ---------- */
+.posts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.posts li {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin: 0 0 0.35rem;
+}
+.posts time,
+.post-date {
+  color: var(--muted);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+.post-date {
+  margin: -0.6rem 0 1.4rem;
+  font-style: italic;
+}
+
+/* ---------- habit tracker (habits.js) ---------- */
+.habits {
+  margin: 1.8rem 0 1rem;
+}
+.habits-scroll {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.habits-scroll::-webkit-scrollbar {
+  display: none;
+}
+.habits-grid {
+  display: block;
+  flex: none;
+  margin-left: auto; /* today stays at the right edge even when there's room to spare */
+}
+.habits-cursor {
+  fill: none;
+  stroke: var(--fg);
+  stroke-opacity: 0.6;
+  pointer-events: none;
+}
+.habits.editing .habits-grid {
+  cursor: pointer;
+}
+.habits-info {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 1.35em;
+  margin-top: 0.4rem;
+  font-size: 0.78rem;
+  font-style: italic;
+  color: var(--muted);
+}
+.habits-edit,
+.habits-login {
+  margin: 0.2rem 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.habits-edit button,
+.habits-login button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--faint);
+  cursor: pointer;
+}
+.habits-login input {
+  width: 14rem;
+  max-width: 55%;
+  margin-right: 0.5rem;
+  padding: 0.1rem 0;
+  border: 0;
+  border-bottom: 1px solid var(--faint);
+  background: none;
+  color: var(--fg);
+  font: inherit;
+}
+
+/* ---------- collage: covers, posters, and portraits behind the links (collage.js) ---------- */
+#collage {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+#collage.shown {
+  opacity: 1;
+  transition-duration: 1.2s;
+}
+body:has(#page.leaving) #collage {
+  opacity: 0;
+  transition-duration: 0.18s;
+}
+#collage img {
+  position: absolute;
+  display: block;
+  height: auto;
+  opacity: 0.14;
+  filter: grayscale(1);
+  transform: translate(-50%, -50%);
+  user-select: none;
 }
 
 /* ---------- footer: the external links ---------- */

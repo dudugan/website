@@ -65,6 +65,7 @@ async function go(url, { push }) {
   page.replaceWith(incoming);
   window.scrollTo(0, push ? 0 : history.state?.y ?? 0);
   document.getElementById('content')?.focus({ preventScroll: true });
+  dispatchEvent(new Event('page:shown'));
   if (!reduceMotion.matches) requestAnimationFrame(() => requestAnimationFrame(() => incoming.classList.remove('entering')));
 }
 

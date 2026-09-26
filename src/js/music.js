@@ -1,4 +1,4 @@
-// Music starts on the first click anywhere; until then a small "click" tag rides under the
+// Music starts on the first click anywhere; until then a small "here" tag rides under the
 // cursor (after jia.build). After that, clicking empty space pauses and resumes. Links and
 // buttons never pause it, so moving between pages doesn't cut the music. The indicator in
 // the bottom-right corner shows playing / not playing and toggles too.
@@ -6,7 +6,7 @@
 // The placeholder soundtrack is generated live with Web Audio: fire crackle, a low drone,
 // and a sparse music box wandering an A-minor pentatonic scale. There are no audio files.
 
-const INTERACTIVE = 'a, button, input, textarea, select, label, summary, [role="button"], [contenteditable]';
+const INTERACTIVE = 'a, button, input, textarea, select, label, summary, [role="button"], [contenteditable], .habits';
 
 export function initMusic() {
   const button = document.getElementById('sound');
@@ -49,7 +49,9 @@ export function initMusic() {
   render();
 }
 
-// ---------- the "click" tag ----------
+// ---------- the "here" tag ----------
+
+const TAG_WORD = 'here';
 
 function clickTag() {
   if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return null;
@@ -57,7 +59,7 @@ function clickTag() {
   const el = document.createElement('div');
   el.id = 'click-tag';
   el.setAttribute('aria-hidden', 'true');
-  el.textContent = 'click';
+  el.textContent = TAG_WORD;
   document.body.append(el);
 
   let introduced = false;
@@ -68,8 +70,10 @@ function clickTag() {
     el.classList.add('shown');
     if (!introduced && !still) {
       introduced = true;
-      scramble(el, 'click');
-      timer = setInterval(() => scramble(el, 'click'), 6500);
+      scramble(el, TAG_WORD);
+      // Now and then, at uneven intervals, the word dissolves and settles again.
+      const again = () => (timer = setTimeout(() => (scramble(el, TAG_WORD), again()), 7000 + Math.random() * 8000));
+      again();
     }
   };
   const leave = (e) => {
@@ -82,7 +86,7 @@ function clickTag() {
     dismiss() {
       removeEventListener('pointermove', move);
       document.removeEventListener('mouseout', leave);
-      clearInterval(timer);
+      clearTimeout(timer);
       el.classList.remove('shown');
       setTimeout(() => el.remove(), 400);
     },
@@ -97,7 +101,7 @@ function scramble(el, word) {
   const tick = () => {
     frame++;
     el.textContent = [...word]
-      .map((ch, i) => (frame / frames > (i + 1) / word.length ? ch : glyphs[(Math.random() * glyphs.length) | 0]))
+      .map((ch, i) => (frame / frames >= (i + 1) / word.length ? ch : glyphs[(Math.random() * glyphs.length) | 0]))
       .join('');
     if (frame < frames) setTimeout(tick, 40);
   };
@@ -251,13 +255,13 @@ function createEngine(AudioCtx) {
         nextNote = now + 0.5;
         nextCrackle = now;
       }
-      clearInterval(timer);
+      clearTimeout(timer);
       schedule();
       timer = setInterval(schedule, 100);
       fadeTo(0.85, 1.6);
     },
     pause() {
-      clearInterval(timer);
+      clearTimeout(timer);
       fadeTo(0, 0.5);
       sleep = setTimeout(() => ctx.suspend(), 600);
     },

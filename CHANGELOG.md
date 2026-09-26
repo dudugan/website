@@ -6,6 +6,66 @@ Working assumptions that haven't been approved yet stay in [PLAN.md](PLAN.md) un
 
 ---
 
+## 2026-09-26: tracker moves to the homepage
+
+### Decided by you
+- **The habit tracker is at the bottom of the homepage** instead of /now.
+- **Its squares are bigger** (16 px, was 12 px), so fewer days show at once: 29 in a desktop-width column (was about 39), and about 20 on a phone.
+
+## 2026-09-26: habit tracker, collage and "here" fixes
+
+### Decided by you
+- **A habit tracker, based on your screenshot**, on /now for now. Put `<!-- habits -->` on its own line in any page to show it there instead.
+  - One row per habit, with no date row and no name column.
+  - Each day is a small rounded square, GitHub-style. A streak joins its squares into one rounded bar.
+  - The rightmost column is always today, and you can scroll sideways through earlier dates.
+  - Hovering shows the habit's name (bottom left) and the date, e.g. "September 26" (bottom right).
+- **Habits are set up in `content/habits.json`**, each with a name, a colour, and a `max-gap`: the number of days in a row it can be missed before the streak breaks.
+- **Colours are dark teal, purple, ember, green, gold, and blue**, each with the same slow gradient shimmer as bold text.
+- **Editing is option B1.** With `?edit` and a GitHub token, the squares become clickable, and clicks are committed to `content/habits.json`.
+- **On narrow screens, collage pictures lean toward the edges** and can hang slightly off-screen. Some still sit in the middle.
+- **The "here" tag now settles to plain "here".** Its last letter used to stay scrambled (an off-by-one). It still dissolves and re-forms, now at uneven intervals of 7–15 s.
+
+### Proposed by Claude while building (tell me if you want any of these changed)
+- **Missed days inside a streak are tinted** with the habit's colour at 42% strength, as in your screenshot.
+  - A streak whose last done day is still within max-gap stays open through today, since today can carry it on.
+- **Streak counts aren't drawn**, because they don't fit on 12 px squares. They could go in the hover line instead (see PLAN.md).
+- **The starting data is transcribed from your screenshot** (Aug 28 – Sep 15), with max-gap 2 for Exercise and 1 for the rest, as the screenshot implies. "Excercise" is spelled "Exercise".
+- **A burst of clicks becomes one commit**, about 1.5 s after the last click.
+  - Saving pulls the latest file first and merges, so edits made in VS Code aren't overwritten.
+  - While you're logged in, the tracker shows the version on GitHub, which can be newer than the deployed page.
+- **You can drag the tracker sideways with the mouse**, and a drag never toggles a square. Clicks on the tracker don't pause or resume the music.
+
+## 2026-09-26: teal bold, "here", writings
+
+### Decided by you
+- **Hovered collage pictures are more opaque.** A hovered picture now goes to full opacity (was 0.9). On narrow screens, where pictures sit under the text, it goes to 0.8 (was 0.45).
+- **Bold text is dark teal/turquoise instead of fire-coloured.** It keeps the same slow 6 s shimmering gradient.
+- **The tag under the cursor says "here"** instead of "click".
+- **A writings page.** `/writings` lists every post in `content/writings/`, newest first, and each post has its own page at `/writings/<slug>`. Two example posts are included.
+
+### Proposed by Claude while building (tell me if you want any of these changed)
+- **Posts need no front matter.** A post is named `YYYY-MM-DD-slug.md`. The date in the name orders the list and is shown under the title. The first `# heading` is the title.
+- **Dates use your d/m/yyyy style**, as on /now: "26/9/2026".
+- **"writings" is added to the header nav.** It stays highlighted while you're reading a post.
+
+## 2026-09-26: a collage behind /influences
+
+### Decided by you
+- **The covers, posters, and people on `/influences` float faintly behind the text**, overlapping one another.
+  - They drift a little as you scroll, and some of them bob before settling.
+  - They brighten as the torch comes near.
+  - Hovering a link brings its own picture up to nearly full strength.
+
+### Proposed by Claude while building (tell me if you want any of these changed)
+- **Each picture sits beside its own link**, in the margin on the link's side and sometimes reaching in under the text. That way, hovering a link always lights something you can see.
+- **The pictures are grey until lit.** Hovering a link brings its picture up in full colour. This keeps the page black and white at rest.
+- **The pictures are downloaded into the repo** (`public/img/links/`, about 1.3 MB, 320 px), not loaded from the other sites. `npm run images` fetches pictures for new links and keeps existing ones. To swap a picture, drop your own jpg in under the same name.
+- **Blogs use their logos, not their writers' faces**, for example the ACX book and the Noahpinion rabbit.
+- **On phones** the pictures spread across the whole width, smaller and fainter.
+- **Reduced motion** turns off the drift and the bob. The torch and hover still brighten the pictures.
+- **Fixed a broken link:** Eliana Du's was `www.elianadu.substack.com`, which doesn't resolve. It's now `elianadu.substack.com`.
+
 ## 2026-09-26: bold text gets a fire gradient
 
 ### Decided by you

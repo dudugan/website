@@ -3,3 +3,5 @@ In the overworld I study morphosyntax, human evolution, animal communication, an
 <!-- In the overworld I'm a biolinguist and a senior at Yale -->
 <!-- I draw a lot of trees and automata.  -->
 <!-- [reprehenderit](/now) -->
+
+<!-- habits -->

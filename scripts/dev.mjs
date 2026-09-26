@@ -20,6 +20,7 @@ const types = {
   '.js': 'text/javascript; charset=utf-8',
   '.svg': 'image/svg+xml',
   '.png': 'image/png',
+  '.jpg': 'image/jpeg',
   '.ico': 'image/x-icon',
   '.woff2': 'font/woff2',
   '.json': 'application/json',
@@ -40,10 +41,10 @@ async function isFile(path) {
   }
 }
 
-// Mirrors GitHub Pages / Vercel cleanUrls: /now -> now.html, / -> index.html.
+// Mirrors GitHub Pages / Vercel cleanUrls: /now -> now.html, /writings -> writings/index.html.
 async function resolve(urlPath) {
   const clean = normalize(decodeURIComponent(urlPath)).replace(/^(\.\.[/\\])+/, '');
-  const candidates = clean.endsWith('/') ? [join(clean, 'index.html')] : [clean, `${clean}.html`];
+  const candidates = clean.endsWith('/') ? [join(clean, 'index.html')] : [clean, `${clean}.html`, join(clean, 'index.html')];
   for (const c of candidates) {
     const path = join(dist, c);
     if (path.startsWith(dist) && (await isFile(path))) return path;

@@ -8,7 +8,7 @@ Brief: [SPEC.md](SPEC.md) · Changes since the brief: [CHANGELOG.md](CHANGELOG.m
 - **Content:** each page is one `.md` file in `content/` that holds only its content (no front matter). A single HTML template renders all of them.
 - **Animation:** every animation loops, lasts at most 7 s per cycle, and moves very little: flutters and small motions that settle back into place. Visitors with `prefers-reduced-motion` get a still version.
 - **Art:** it should look hand-drawn, after Giraud/Moebius, Miyazaki, McCay, Jansson, and Sempé.
-- **Layout:** minimal, like nel.ag and jia.build. For now it's black and white, and the torch fire is the only colour.
+- **Layout:** minimal, like nel.ag and jia.build. At rest it's black and white. The only colours are the torch's fire and the teal gradient on bold text. A collage picture turns to full colour only while its link is hovered.
 - **No-JS baseline:** with JavaScript off, all text and links still work. Every effect is layered on top of that.
 
 ---
@@ -22,15 +22,16 @@ website/
 │   ├── index.md             → /
 │   ├── now.md               → /now
 │   ├── past-lives.md        → /past-lives
-│   └── influences.md        → /influences
+│   ├── influences.md        → /influences
+│   └── writings/            → /writings (the list) and /writings/<slug> (each post)
 ├── site.config.json         ← name, description, nav order, the 5 external links
 ├── src/
 │   ├── layout.html          ← the ONLY html file in the source (the build enforces this)
 │   ├── css/site.css
-│   ├── js/                  ← main, router, loader, torch, music
+│   ├── js/                  ← main, router, loader, torch, music, collage
 │   └── art/                 ← procession.mjs (the loader drawing), favicon.svg
-├── public/                  ← icons + web manifest, copied as-is
-├── scripts/                 ← build.mjs, dev.mjs, icons.mjs
+├── public/                  ← icons, web manifest, img/links/ (collage pictures), copied as-is
+├── scripts/                 ← build.mjs, dev.mjs, icons.mjs, images.mjs
 ├── .github/workflows/deploy.yml   ← GitHub Pages
 ├── vercel.json              ← for later
 └── dist/                    ← generated output, gitignored, never hand-edited
@@ -92,6 +93,22 @@ website/
 27. `[x]` After that, clicking empty space pauses or resumes, and links never pause it. The bottom-right indicator shows bars and "playing" / "not playing", and clicking it also toggles the music. The sound fades in and out.
 28. `[x]` The placeholder soundtrack is generated live with Web Audio: fire crackle, a low A drone, and a music box wandering an A-minor pentatonic scale. There are no audio files.
 
+### Phase 9b: Influences collage
+28a. `[x]` `npm run images` fetches one picture per link on `/influences` into `public/img/links/`: covers, posters, portraits, and blog logos. The build tags each link that has a picture with `data-img`.
+28b. `[x]` `collage.js` places each picture beside its link, grey and faint. It drifts with scroll, and some pictures bob on springs and settle within about 1 s. Pictures brighten near the torch, and a hovered or focused link brings its picture up in colour. The collage is rebuilt on every page swap and is off without JS.
+28c. `[!]` 8 links have no picture yet (see "What you need to do").
+
+### Phase 9c: Writings
+28d. `[x]` Posts are `content/writings/YYYY-MM-DD-slug.md`, with the first `# heading` as the title. The build writes one page per post plus a newest-first list at `/writings`, and "writings" is in the nav. There are two example posts.
+
+### Phase 9d: Habit tracker
+28e. `[x]` The tracker sits at the bottom of the homepage. `content/habits.json` holds the habits: name, colour, max-gap, and the days done. One renderer (`src/js/habits.js`) draws it at build time and again in the browser, so the rightmost column is always today.
+   - Each day is a small rounded square. A streak joins its squares into one bar, with missed days tinted.
+   - Each colour has a slow gradient shimmer.
+   - Hovering shows the habit's name (left) and the date (right).
+   - You can scroll or drag sideways through the dates.
+28f. `[x]` Edit mode (option B1): `?edit` plus a GitHub token lets you click squares. Clicks are committed to the file via the GitHub API, merged with any newer version of the file. It's tested against a fake GitHub (login, merge, conflict retry, bad token, log out) but hasn't yet been tried with a real token.
+
 ### Phase 10: Polish and QA
 29. `[~]` Accessibility. Reduced motion, keyboard focus, `aria-pressed` on the sound button, and `aria-hidden` on decorative layers are done. The remaining work is a full screen-reader pass.
 30. `[x]` Size.
@@ -125,8 +142,16 @@ website/
    - Put your name and the real links in `site.config.json`.
    - Send music files if you want real tracks instead of the generated placeholder.
 3. **Later:** connect Vercel and your domain.
+4. **Habit tracker.**
+   - Make the token and log in on the homepage with `?edit` (README → Habit tracker).
+   - Fill in Sep 16–26, and the days before Aug 28 that your screenshot's 13-day streaks imply.
+5. **Collage pictures.**
+   - These links have no picture: slchld, Guardians of Ga'Hoole, IKEA Heights, Raffaella Zanuttini, Gary Tomlinson, and Richard Prum (their Wikipedia pages have none), plus Michael Gao (no images on his site).
+   - Neelasha Sudarshan's link (`neelasha-s.github.io`) returns 404, so it needs a working URL.
+   - To add a picture by hand, drop a jpg into `public/img/links/` under the name `npm run images` reports for it.
 
 ## Open decisions
 
+- **Streak numbers.** Your screenshot shows each streak's count at its end, but it doesn't fit on 16 px squares. It could go in the hover line instead.
 - **Real music.** Keep the generated placeholder, or swap in files, which would add an mp3/ogg player and possibly a track list like jia.build's.
 - **Open Graph preview image.** What should the link preview show?
