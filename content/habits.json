@@ -41,7 +41,9 @@
       "name": "Write a musing",
       "color": "green",
       "max-gap": 2,
-      "done": []
+      "done": [
+        "2026-09-25"
+      ]
     }
   ]
 }
