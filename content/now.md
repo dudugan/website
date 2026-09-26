@@ -1,3 +1,5 @@
+<!-- habits -->
+
 *26/9/2026.*
 - current SPAR research fellow working with Morgan Sinclaire on collusion in untrusted monitoring
 - senior at Yale University (actually, a '27.5) writing my thesis with Bob Frank on making tier-based strictly-local models of Agree more derivational
