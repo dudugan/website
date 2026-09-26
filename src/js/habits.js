@@ -1,6 +1,6 @@
 // Habit tracker: one row per habit, one small square per day, today at the right edge.
 // Done days fill with the habit's colour; a streak (misses no longer than the habit's
-// max-gap) joins its squares into one rounded bar, with the missed days tinted. The same
+// max-gap) is strung together by a thin line through the middle of its squares. The same
 // renderer runs at build time (so the page works without JS) and in the browser (so the
 // last column is always the visitor's today).
 //
@@ -8,22 +8,21 @@
 // this repo's contents. The squares become clickable, and clicks are committed to
 // content/habits.json through the GitHub API, which redeploys the site.
 
-// Faded colours: six shades each for the flowing base, plus a light and a deep tone for the
-// sheen that drifts across it.
+// Dark, faded colours that sit back in the black: six shades each for the flowing base,
+// plus a light and a deep tone for the sheen that drifts across it.
 export const PALETTES = {
-  teal: { shades: ['#9acbc4', '#74beae', '#bad8d7', '#87c4b4', '#64b9b4', '#afcfd0'], light: '#e0ebe9', deep: '#45877e' },
-  purple: { shades: ['#b49dc8', '#9678ba', '#cdbdd6', '#a08bc1', '#9669b5', '#c5b1cd'], light: '#e6e1ea', deep: '#684983' },
-  ember: { shades: ['#daa08b', '#d27560', '#e3c3b0', '#d68276', '#d0794e', '#ddbba2'], light: '#f0e1db', deep: '#9b4d31' },
-  green: { shades: ['#9fc6a4', '#7ab87d', '#bed5c3', '#8dbf8d', '#6bb379', '#b3ccba'], light: '#e2e9e3', deep: '#4b8153' },
-  gold: { shades: ['#d7c18e', '#cea564', '#e1d8b2', '#d2ac79', '#cbaf52', '#dad3a4'], light: '#efe9dc', deep: '#977a35' },
-  blue: { shades: ['#95add0', '#6e98c4', '#b7c2dc', '#82a8c9', '#5d7ec0', '#abb4d4'], light: '#dfe4ec', deep: '#3f5e8d' },
+  teal: { shades: ['#325d57', '#254b43', '#42706f', '#2b5449', '#1f4240', '#3c6162'], light: '#5d9890', deep: '#0e1b19' },
+  purple: { shades: ['#49355a', '#362749', '#5e466d', '#3c2e52', '#342140', '#553f5f'], light: '#7c6293', deep: '#150f1a' },
+  ember: { shades: ['#653929', '#52281e', '#7b5037', '#5c2b24', '#482919', '#6c4b33'], light: '#a6664e', deep: '#1d100c' },
+  green: { shades: ['#36593b', '#28482a', '#476b50', '#2f502f', '#223f28', '#415d49'], light: '#64906a', deep: '#101911' },
+  gold: { shades: ['#63522c', '#503e21', '#786b3b', '#594326', '#463c1b', '#686236'], light: '#a28a53', deep: '#1c180d' },
+  blue: { shades: ['#31435e', '#24374c', '#404f72', '#2a4155', '#1e2a43', '#3a4464'], light: '#5b749a', deep: '#0e131b' },
 };
 
 const S = 16; // square
 const GAP = 4;
 const STEP = S + GAP;
 const R = 4; // corner radius
-const VISIBLE = 14; // days in view at once; scroll for the rest
 const PERIOD = 160; // width of one sweep through a colour's shades
 const SHEEN = 64; // width of one band of the sheen
 const DAY = 86400000;
@@ -80,24 +79,13 @@ function streaksOf(days, maxGap, today) {
   const out = [];
   for (const d of days) {
     const s = out.at(-1);
-    if (s && d - s.end - 1 <= maxGap) {
-      const run = s.runs.at(-1);
-      if (d === run[1] + 1) run[1] = d;
-      else s.runs.push([d, d]);
-      s.end = d;
-    } else out.push({ start: d, end: d, runs: [[d, d]] });
+    if (s && d - s.end - 1 <= maxGap) s.end = d;
+    else out.push({ start: d, end: d });
   }
   for (const s of out) s.to = s.end;
   const last = out.at(-1);
   if (last && today - last.end - 1 <= maxGap) last.to = today; // still alive: today can carry it on
   return out;
-}
-
-// A rectangle whose left and right corners can be rounded separately.
-function bar(x, y, w, h, rl, rr) {
-  const right = rr ? `A${rr},${rr} 0 0 1 ${x + w},${y + rr}V${y + h - rr}A${rr},${rr} 0 0 1 ${x + w - rr},${y + h}` : `V${y + h}`;
-  const left = rl ? `A${rl},${rl} 0 0 1 ${x},${y + h - rl}V${y + rl}A${rl},${rl} 0 0 1 ${x + rl},${y}` : `V${y}`;
-  return `M${x + rl},${y}H${x + w - rr}${right}H${x + rl}${left}Z`;
 }
 
 export function renderTracker({ habits }, today, { animate = true } = {}) {
@@ -110,24 +98,24 @@ export function renderTracker({ habits }, today, { animate = true } = {}) {
   const x = (d) => (d - start) * STEP;
 
   const used = new Set();
-  const body = [`<rect width="${w}" height="${h}" fill="url(#habit-off)"/>`];
+  const lines = [];
+  const squares = [];
   habits.forEach((habit, r) => {
     const y = r * STEP;
-    const base = `url(#habit-${habit.color})`;
-    const paint = (shape) => shape.replace('/>', ` fill="${base}"/>`) + shape.replace('/>', ` fill="url(#habit-${habit.color}-sheen)"/>`);
+    const { shades } = PALETTES[habit.color];
     used.add(habit.color);
     for (const s of streaksOf(days[r], habit.maxGap, today)) {
-      if (s.to === s.start) {
-        body.push(paint(`<rect x="${x(s.start)}" y="${y}" width="${S}" height="${S}" rx="${R}"/>`));
-        continue;
-      }
-      const span = (a, b, rl, rr) => bar(x(a), y, x(b) + S - x(a), S, rl, rr);
-      // Blank out the empty squares underneath, then the tinted bar, then the days done.
-      body.push(`<path d="${span(s.start, s.to, R, R)}" fill="#000"/>`);
-      body.push(`<path d="${span(s.start, s.to, R, R)}" fill="${base}" fill-opacity="0.3"/>`);
-      for (const [a, b] of s.runs) body.push(paint(`<path d="${span(a, b, a === s.start ? R : 0, b === s.to ? R : 0)}"/>`));
+      if (s.to === s.start) continue;
+      const mid = y + S / 2;
+      lines.push(`<line x1="${x(s.start) + S / 2}" y1="${mid}" x2="${x(s.to) + S / 2}" y2="${mid}" stroke="${shades[2]}" stroke-width="2" stroke-linecap="round"/>`);
+    }
+    for (const d of days[r]) {
+      const square = `<rect x="${x(d)}" y="${y}" width="${S}" height="${S}" rx="${R}"`;
+      squares.push(`${square} fill="url(#habit-${habit.color})"/>${square} fill="url(#habit-${habit.color}-sheen)"/>`);
     }
   });
+  // The streak lines run under the squares, so they show in the gaps and across missed days.
+  const body = [`<rect width="${w}" height="${h}" fill="url(#habit-off)"/>`, ...lines, ...squares];
 
   const off = `<pattern id="habit-off" width="${STEP}" height="${STEP}" patternUnits="userSpaceOnUse"><rect width="${S}" height="${S}" rx="${R}" fill="#171717"/></pattern>`;
   return (
@@ -185,7 +173,7 @@ function gradients(name, animate) {
     `${animate ? drift(rand, PERIOD * 0.9, 18) : ''}</linearGradient>`;
   const sheen =
     `<linearGradient id="habit-${name}-sheen" gradientUnits="userSpaceOnUse" ${toward(-40 - rand() * 30, SHEEN)} spreadMethod="reflect">` +
-    stops([[light, 0.55], [light, 0], [deep, 0.3], [deep, 0], [light, 0.35]]) +
+    stops([[light, 0.4], [light, 0], [deep, 0.45], [deep, 0], [light, 0.25]]) +
     `${animate ? drift(rand, SHEEN * 1.2, SHEEN * 0.6) : ''}</linearGradient>`;
   return base + sheen;
 }
@@ -194,7 +182,7 @@ const escapeAttr = (s) => String(s).replace(/[&"<>]/g, (c) => `&#${c.charCodeAt(
 
 export function trackerFigure(data, today, { repo, branch, file }) {
   const json = JSON.stringify(data).replace(/</g, '\\u003c');
-  return `<figure class="habits" style="max-width: ${VISIBLE * STEP - GAP}px" data-repo="${escapeAttr(repo)}" data-branch="${escapeAttr(branch)}" data-file="${escapeAttr(file)}">
+  return `<figure class="habits" data-repo="${escapeAttr(repo)}" data-branch="${escapeAttr(branch)}" data-file="${escapeAttr(file)}">
 <div class="habits-scroll" tabindex="0" aria-label="habit tracker">${renderTracker(data, today)}</div>
 <figcaption class="habits-info"><span></span><span></span></figcaption>
 <script type="application/json" class="habits-data">${json}</script>

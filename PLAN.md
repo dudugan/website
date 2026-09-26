@@ -86,7 +86,7 @@ website/
    - the raven hops, the caveman nods, the spider hops
    - the boy and naledi bob, the dolphin arcs, the pequeniño twitches its ears
    - the robot tilts its head, and the elephant swings its trunk and flaps an ear.
-25. `[x]` It shows on the first page of a visit only. It stays up until the page has loaded and at least 2.3 s have passed (6 s at most), then fades over 0.8 s. Clicking it skips it. Lines get heavier on phones.
+25. `[x]` It shows on the first page of a visit, and again on every reload (never when moving to another page). It stays up until the page has loaded and at least 2.3 s have passed (6 s at most), then fades over 0.8 s. Clicking it skips it. Lines get heavier on phones.
 
 ### Phase 9: Music
 26. `[x]` It starts on the first click anywhere, with a "click" tag under the cursor until then (its letters scramble in, like jia.build's).
@@ -96,16 +96,16 @@ website/
 ### Phase 9b: Influences collage
 28a. `[x]` `npm run images` fetches one picture per link on `/influences` into `public/img/links/`: covers, posters, portraits, and blog logos. The build tags each link that has a picture with `data-img`.
 28b. `[x]` `collage.js` places each picture beside its link, grey and faint. It drifts with scroll, and some pictures bob on springs and settle within about 1 s. Pictures brighten near the torch, and a hovered or focused link brings its picture up in colour. The collage is rebuilt on every page swap and is off without JS.
-28c. `[!]` 8 links have no picture yet (see "What you need to do").
+28c. `[x]` Every link has a picture. Most are ones you picked, resized to 320 px.
 
 ### Phase 9c: Writings
 28d. `[x]` Posts are `content/writings/YYYY-MM-DD-slug.md`, with the first `# heading` as the title. The build writes one page per post plus a newest-first list at `/writings`, and "writings" is in the nav. There are two example posts.
 
 ### Phase 9d: Habit tracker
-28e. `[x]` The tracker sits at the bottom of the homepage. `content/habits.json` holds the habits: name, colour, max-gap, and the days done. One renderer (`src/js/habits.js`) draws it at build time and again in the browser, so the rightmost column is always today.
-   - Each day is a small rounded square. A streak joins its squares into one bar, with missed days tinted.
-   - Colours are faded pastels that flow like liquid: two drifting gradient layers per colour, each looping in under 7 s.
-   - It's centred and shows 14 days at a time.
+28e. `[x]` `content/habits.json` holds the habits: name, colour, max-gap, and the days done. One renderer (`src/js/habits.js`) draws it at build time and again in the browser, so the rightmost column is always today.
+   - Each day is a small rounded square, and only done days are coloured. A streak is strung together by a thin solid line through the middle, which also runs across its missed days.
+   - Colours are dark and faded, and flow like liquid: two drifting gradient layers per colour, each looping in under 7 s.
+   - The squares are 16 px, so the full column shows about 29 days on desktop. It sits at the top of /now.
    - Hovering shows the habit's name (left) and the date (right).
    - You can scroll or drag sideways through the dates.
 28f. `[x]` Edit mode (option B1): `?edit` plus a GitHub token lets you click squares. Clicks are committed to the file via the GitHub API, merged with any newer version of the file. It's tested against a fake GitHub (login, merge, conflict retry, bad token, log out) but hasn't yet been tried with a real token.
@@ -146,10 +146,7 @@ website/
 4. **Habit tracker.**
    - Make the token and log in on the homepage with `?edit` (README → Habit tracker).
    - Fill in Sep 16–26, and the days before Aug 28 that your screenshot's 13-day streaks imply.
-5. **Collage pictures.**
-   - These links have no picture: slchld, Guardians of Ga'Hoole, IKEA Heights, Raffaella Zanuttini, Gary Tomlinson, and Richard Prum (their Wikipedia pages have none), plus Michael Gao (no images on his site).
-   - Neelasha Sudarshan's link (`neelasha-s.github.io`) returns 404, so it needs a working URL.
-   - To add a picture by hand, drop a jpg into `public/img/links/` under the name `npm run images` reports for it.
+5. **Collage pictures.** Every link on /influences now has one. To add a picture for a new link by hand, drop a jpg into `public/img/links/` under the name `npm run images` reports for it.
 
 ## Open decisions
 

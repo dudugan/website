@@ -30,7 +30,8 @@ const types = {
   '.pdf': 'application/pdf',
 };
 
-const reloadScript = `<script>new EventSource('/__reload').onmessage = () => location.reload();</script>`;
+// Marks the reload as the dev server's, so the loader (which replays on real reloads) stays away.
+const reloadScript = `<script>new EventSource('/__reload').onmessage = () => { sessionStorage.setItem('dev-reload', '1'); location.reload(); };</script>`;
 const clients = new Set();
 
 async function isFile(path) {

@@ -6,6 +6,32 @@ Working assumptions that haven't been approved yet stay in [PLAN.md](PLAN.md) un
 
 ---
 
+## 2026-09-26: separate squares with streak lines, more pictures
+
+### Decided by you
+- **The tracker keeps its 16 px squares and fills the column with more days**, instead of scaling the squares up. That's about 29 days on desktop and about 20 on a phone.
+- **Streaks are no longer joined bars.** Every done day is its own rounded square, and only the squares are gradient-animated. A thin line in the habit's colour runs through the middle of a streak's squares and across its missed days. When the streak is still alive, the line runs on to today.
+- **Your pictures for 8 more /influences links:**
+  - New for Guardians of Ga'Hoole, slchld, Raffaella Zanuttini, Gary Tomlinson, Neelasha Sudarshan, and IKEA Heights.
+  - Replaced for Avatar: The Last Airbender and Arcane.
+- **Neelasha Sudarshan's link is now `https://neelasha-s.github.io/neelasha.github.io/`.** The old one returned 404.
+- **Pictures for Richard Prum and Michael Gao**, so every /influences link now has one.
+
+### Proposed by Claude while building (tell me if you want any of these changed)
+- **The streak line is solid, not animated**, in the lightest of the habit's shades, 2 px thick with rounded ends. It's drawn beneath the squares.
+
+## 2026-09-26: full-width tracker, darker colours, loader on reload, your pictures
+
+### Decided by you
+- **The tracker spans the full column again**, still showing 14 days. The squares scale up to fill the width: about 34 px on a desktop column and about 24 px on a phone.
+- **The tracker's colours are darker than the originals and faded into the background.** They're still visible, and still flow like liquid.
+- **The loader plays again when a page is reloaded**, as well as on the first page of a visit. Moving to another page never shows it.
+- **Your pictures replace 20 of the /influences images:** Battlestar Galactica, Black Panther, Maria Mercedes Piñango, David Watts, Chris Shia, Deven Huang, Casey Dunn, Jim Wood, Katelyn Wang, Ken Liu, Laundry Day, the Sequences, Nas, Oneohtrix Point Never, Richard Bribiescas, Simon Charlow, Ted Chiang, Unsong, Warriors, and Wings of Fire. Each is resized to 320 px (12–46 KB).
+
+### Proposed by Claude while building (tell me if you want any of these changed)
+- **Missed days inside a streak are tinted at 50%** (was 30%), so they still stand out from empty days at the darker colours.
+- **Saving a file under `npm run dev` doesn't replay the loader**, even though it reloads the page.
+
 ## 2026-09-26: paler, liquid tracker
 
 ### Decided by you

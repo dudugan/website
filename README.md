@@ -7,13 +7,13 @@ A minimalist personal site. Each page is one markdown file, and all pages share 
 | to change… | edit |
 | --- | --- |
 | a page's text | `content/<page>.md` (only content, no front matter) |
-| the habit tracker | `content/habits.json` (put `<!-- habits -->` on its own line in any page to show it; it's at the bottom of the homepage) |
+| the habit tracker | `content/habits.json` (put `<!-- habits -->` on its own line in any page to show it; it's at the top of /now) |
 | a blog post | `content/writings/YYYY-MM-DD-slug.md`; its first `# heading` is the title, and it's listed at `/writings` |
 | name, description, nav order, the 5 external links | `site.config.json` |
 | layout / chrome | `src/layout.html` (the only HTML file) and `src/css/site.css` |
 | the loader drawing | `src/art/procession.mjs` |
 | the favicon | `src/art/favicon.svg`, then `npm run icons` |
-| the pictures behind `/influences` | `npm run images` fetches one per link into `public/img/links/`; to swap one, drop your own jpg in under the same name |
+| the pictures behind `/influences` | `npm run images` fetches one per link into `public/img/links/`; to swap one, drop your own jpg in under the same name (`--force` refetches everything and would overwrite those) |
 
 A new `content/foo.md` becomes `/foo` automatically. Add `"foo"` to `nav` in `site.config.json` to link it in the header.
 
@@ -40,7 +40,7 @@ Add or reorder habits by editing the file. Days can be edited there too, or by c
 1. **Make a token.** On GitHub, go to Settings → Developer settings → Fine-grained tokens → Generate new token.
    - Repository access: only `dudugan/website`.
    - Permissions: **Contents: Read and write**, nothing else.
-2. **Log in.** Open the live homepage with `?edit` on the end of the address, paste the token, and press "log in". The token stays in that browser only, so repeat this once per device.
+2. **Log in.** Open the live /now page with `?edit` on the end of the address, paste the token, and press "log in". The token stays in that browser only, so repeat this once per device.
 3. **Click squares to mark days done or not done.** A burst of clicks becomes one commit to `content/habits.json`, and the site redeploys about a minute later.
 4. **Log out** with the link under the tracker. To cut a token off everywhere, delete it on GitHub.
 

@@ -1,6 +1,6 @@
 // The procession stays up until the page has loaded (and at least MIN_MS have passed so
-// the wave can travel down the line), then fades into the site. First page of a visit only:
-// the inline script in <head> decides that before first paint by adding .loading.
+// the wave can travel down the line), then fades into the site. First page of a visit, and
+// reloads: the inline script in <head> decides that before first paint by adding .loading.
 
 const MIN_MS = 4300;
 const MAX_MS = 8000;

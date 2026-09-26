@@ -239,7 +239,7 @@ main strong {
 
 /* ---------- habit tracker (habits.js) ---------- */
 .habits {
-  margin: 1.8rem auto 1rem; /* narrower than the column (see VISIBLE in habits.js), centred */
+  margin: 1.8rem 0 1rem;
 }
 .habits-scroll {
   display: flex;

@@ -15,11 +15,18 @@
   <link rel="preload" href="{{base}}/fonts/eb-garamond-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="{{base}}/assets/site.css?v={{v}}">
   <script>
-    // Runs before first paint: the loader only shows on the first page of a visit.
+    // Runs before first paint: the loader shows on the first page of a visit, and again
+    // whenever the page is reloaded (but not when moving to another page).
     (function (d) {
       d.classList.add('js');
       try {
-        if (!sessionStorage.getItem('seen-loader') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        var nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+        var reload = nav ? nav.type === 'reload' : performance.navigation && performance.navigation.type === 1;
+        if (sessionStorage.getItem('dev-reload')) {
+          sessionStorage.removeItem('dev-reload'); // a save in npm run dev, not a visitor reloading
+          reload = false;
+        }
+        if ((reload || !sessionStorage.getItem('seen-loader')) && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
           d.classList.add('loading');
         }
       } catch (e) {}
