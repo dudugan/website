@@ -32,7 +32,9 @@
       "name": "Respond to messages",
       "color": "purple",
       "max-gap": 2,
-      "done": []
+      "done": [
+        "2026-09-22"
+      ]
     },
     {
       "name": "Write a musing",
