@@ -360,6 +360,11 @@ body:has(#page.leaving) #collage {
   user-select: none;
 }
 
+/* touch screens: a pictured link tapped once (its picture is lit; the next tap opens it) */
+main a.armed {
+  text-decoration-color: currentColor;
+}
+
 /* ---------- footer: the external links ---------- */
 footer {
   margin-top: 1.6rem;

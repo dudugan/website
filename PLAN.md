@@ -78,7 +78,7 @@ website/
 ### Phase 7: Torch cursor
 20. `[x]` A warm halo with a slight carried lag, flickering from noise, with flame licks rising and the occasional ember. Drawn on one half-resolution canvas and screen-blended over the page.
 21. `[–]` "Light reveals bricks" was dropped along with the cellar.
-22. `[x]` The effect is off on touch screens and becomes a steady glow under reduced motion.
+22. `[x]` On touch screens the torch hovers, smaller, near the bottom of the screen instead of following a cursor. Under reduced motion it's a steady glow.
 
 ### Phase 8: Loading animation ⛳ your review
 23. `[x]` All nine figures are drawn: raven, caveman, jumping spider, boy (a Petit Nicolas nod), dolphin mid-leap, pequeniño with a staff, C-3PO-like robot, *Homo naledi*, and elephant. **Waiting on your feedback.**
@@ -86,8 +86,8 @@ website/
    - the raven hops, the caveman nods, the spider hops
    - the boy and naledi bob, the dolphin arcs, the pequeniño twitches its ears
    - the robot tilts its head, and the elephant swings its trunk and flaps an ear.
-24b. `[x]` Hovering a being shows its species name in italics, in one line centred under the procession (pequeniño and robot are named just that).
-25. `[x]` It shows on the first page of a visit, and again on every reload (never when moving to another page). It stays up until the page has loaded and at least 2.3 s have passed (6 s at most), then fades over 0.8 s. Clicking it skips it. Lines get heavier on phones.
+24b. `[x]` Hovering a being (or tapping it, on a phone) shows its species name in italics, in one line centred under the procession (pequeniño and robot are named just that).
+25. `[x]` It shows on the first page of a visit, and again on every reload (never when moving to another page). It stays up until the page has loaded and at least 4.3 s have passed (8 s at most), then fades over 0.8 s. Clicking it does not skip it. Lines get heavier on phones.
 
 ### Phase 9: Music
 26. `[x]` It starts on the first click anywhere, with a "click" tag under the cursor until then (its letters scramble in, like jia.build's).
@@ -97,6 +97,7 @@ website/
 ### Phase 9b: Influences collage
 28a. `[x]` `npm run images` fetches one picture per link on `/influences` into `public/img/links/`: covers, posters, portraits, and blog logos. The build tags each link that has a picture with `data-img`.
 28b. `[x]` `collage.js` places each picture beside its link, grey and faint. It drifts with scroll, and some pictures bob on springs and settle within about 1 s. Pictures brighten near the torch, and a hovered or focused link brings its picture up in colour. The collage is rebuilt on every page swap and is off without JS.
+28b2. `[x]` On touch screens the hovering torch stands in for the cursor. Pictures passing near it as you scroll light up, the more the closer. The first tap on a pictured link lights its picture fully, and a second tap opens it.
 28c. `[x]` Every link has a picture. Most are ones you picked, resized to 320 px.
 
 ### Phase 9e: Folding sections

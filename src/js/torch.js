@@ -1,13 +1,18 @@
 // A torch carried by the cursor: a warm halo that flickers, small flame licks rising
 // off it, and the odd ember. Drawn on one half-resolution canvas (it is all soft light
-// anyway) and screen-blended over the page. Mouse only; reduced motion gets a steady glow.
+// anyway) and screen-blended over the page. Reduced motion gets a steady glow.
+// Touch screens have no cursor to carry it, so there it hovers, smaller, near the bottom.
 
 const SCALE = 0.5;
 const TAU = Math.PI * 2;
 
+// Where the flame is (viewport px), for the collage's torchlight on touch screens.
+export const flame = { x: 0, y: 0, on: false };
+
 export function initTorch() {
-  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  const hovering = !matchMedia('(hover: hover) and (pointer: fine)').matches;
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const size = hovering ? 0.6 : 1;
 
   const canvas = document.createElement('canvas');
   canvas.id = 'torch';
@@ -54,6 +59,18 @@ export function initTorch() {
     last = now;
     const t = now / 1000;
 
+    if (hovering) {
+      // Drift a few pixels around a spot just above the bottom edge, on slow, uneven loops.
+      const drift = still ? 0 : 1;
+      pointer.x = w / 2 + drift * (Math.sin(t * 0.37) * 12 + Math.sin(t * 0.83 + 2) * 5);
+      pointer.y = h - 56 + drift * (Math.sin(t * 0.52 + 1) * 6 + Math.sin(t * 1.1) * 2);
+      if (!pointer.seen) {
+        pointer.seen = true;
+        pos.x = pointer.x;
+        pos.y = pointer.y;
+      }
+    }
+
     // Follow with a little weight, as if carried. Frame-rate independent easing.
     const prevX = pos.x;
     const prevY = pos.y;
@@ -69,14 +86,20 @@ export function initTorch() {
 
     const a = presence;
     const fx = pos.x;
-    const fy = pos.y - 4; // the flame sits just above the hand
+    const fy = pos.y - 4 * size; // the flame sits just above the hand
+    flame.x = fx;
+    flame.y = fy;
+    if (!flame.on && a > 0.5) {
+      flame.on = true;
+      dispatchEvent(new Event('torch:lit'));
+    }
 
     ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
     ctx.clearRect(0, 0, w, h);
     ctx.globalCompositeOperation = 'lighter';
 
     // Halo: the light the torch throws around it.
-    glow(fx, fy - 10, 210 * (1 + 0.05 * f), [
+    glow(fx, fy - 10 * size, 210 * size * (1 + 0.05 * f), [
       [0, `rgba(255,175,95,${0.42 * a * (1 + 0.18 * f)})`],
       [0.22, `rgba(235,115,45,${0.2 * a})`],
       [0.55, `rgba(150,50,15,${0.07 * a})`],
@@ -96,10 +119,10 @@ export function initTorch() {
           licks.splice(i, 1);
           continue;
         }
-        const lx = l.x + (fx - l.x) * 0.6 + Math.sin(l.phase + t * 9) * 3 * p;
-        const ly = l.y + (fy - l.y) * 0.6 - p * 30;
+        const lx = l.x + (fx - l.x) * 0.6 + Math.sin(l.phase + t * 9) * 3 * size * p;
+        const ly = l.y + (fy - l.y) * 0.6 - p * 30 * size;
         const alpha = Math.pow(1 - p, 1.6) * 0.55 * a;
-        glow(lx, ly, 20 * (1 - p * 0.65), [
+        glow(lx, ly, 20 * size * (1 - p * 0.65), [
           [0, `rgba(255,232,185,${alpha})`],
           [0.45, `rgba(255,140,55,${alpha * 0.5})`],
           [1, 'rgba(0,0,0,0)'],
@@ -110,13 +133,13 @@ export function initTorch() {
       const rate = (0.7 + Math.min(speed / 350, 3)) * a;
       if (Math.random() < rate * dt) {
         embers.push({
-          x: fx + (Math.random() - 0.5) * 10,
-          y: fy - 10,
-          vx: (Math.random() - 0.5) * 16,
-          vy: -(30 + Math.random() * 40),
+          x: fx + (Math.random() - 0.5) * 10 * size,
+          y: fy - 10 * size,
+          vx: (Math.random() - 0.5) * 16 * size,
+          vy: -(30 + Math.random() * 40) * size,
           age: 0,
           life: 0.8 + Math.random() * 1.1,
-          r: 1 + Math.random() * 1.1,
+          r: (1 + Math.random() * 1.1) * Math.max(size, 0.8),
           phase: Math.random() * TAU,
         });
       }
@@ -138,7 +161,7 @@ export function initTorch() {
     }
 
     // Hot core right at the flame.
-    glow(fx, fy, 16, [
+    glow(fx, fy, 16 * size, [
       [0, `rgba(255,240,215,${0.38 * a * (1 + 0.2 * f)})`],
       [1, 'rgba(0,0,0,0)'],
     ]);
@@ -166,10 +189,16 @@ export function initTorch() {
     },
     { passive: true },
   );
+  addEventListener('resize', resize);
+  resize();
+
+  if (hovering) {
+    want = 1; // always lit; requestAnimationFrame already pauses it in background tabs
+    wake();
+    return;
+  }
   document.addEventListener('mouseout', (e) => {
     if (!e.relatedTarget) want = 0;
   });
   addEventListener('blur', () => (want = 0));
-  addEventListener('resize', resize);
-  resize();
 }

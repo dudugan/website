@@ -31,14 +31,24 @@ export function runLoader() {
     document.readyState === 'complete' ? Promise.resolve() : new Promise((r) => addEventListener('load', r, { once: true }));
   loaded.then(() => setTimeout(finish, Math.max(0, MIN_MS - performance.now())));
   setTimeout(finish, MAX_MS);
-  loader.addEventListener('click', finish); // impatient visitors can click through
 }
 
-// Each being's hover area covers its drawing (sized from its outline, in its own coordinates),
-// and hovering one puts its name in the single line under the procession.
+// Each being's hover area covers its drawing (sized from its outline, in its own coordinates).
+// Hovering one with a mouse puts its name in the single line under the procession; on touch
+// screens a tap does, and the name stays until another being or empty space is tapped.
 function nameBeings(loader) {
   const figs = loader.querySelectorAll('.procession .fig');
   const line = loader.querySelector('.species');
+  const show = (name) => {
+    line.textContent = name;
+    line.classList.add('shown');
+  };
+  const hide = () => line.classList.remove('shown');
+  loader.addEventListener('click', (e) => {
+    const hit = e.target.closest('.hit');
+    if (hit) show(hit.dataset.name);
+    else hide();
+  });
   loader.querySelectorAll('.procession .hit').forEach((hit, i) => {
     const box = figs[i]?.getBBox();
     if (!box) return;
@@ -47,10 +57,8 @@ function nameBeings(loader) {
     hit.setAttribute('y', box.y - pad);
     hit.setAttribute('width', box.width + pad * 2);
     hit.setAttribute('height', box.height + pad * 2);
-    hit.addEventListener('pointerenter', () => {
-      line.textContent = hit.dataset.name;
-      line.classList.add('shown');
-    });
-    hit.addEventListener('pointerleave', () => line.classList.remove('shown'));
+    // A touch "enters" on touch-down and "leaves" on lift, so only a mouse hovers.
+    hit.addEventListener('pointerenter', (e) => e.pointerType === 'mouse' && show(hit.dataset.name));
+    hit.addEventListener('pointerleave', (e) => e.pointerType === 'mouse' && hide());
   });
 }

@@ -2,6 +2,12 @@
 // that `npm run images` found a picture for). Each image sits beside its own link, drifts a
 // little with scroll and bobs when the page moves, brightens as the torch comes near, and
 // comes up in colour while its link is hovered or focused.
+//
+// Touch screens have no hover, so there the torch hovering at the bottom does the work: as
+// you scroll, pictures passing near it are lit, in colour, the more the closer. And the first
+// tap on a pictured link lights its picture fully; a second tap on the same link opens it.
+
+import { flame } from './torch.js';
 
 const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const mouse = matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -9,7 +15,9 @@ const mouse = matchMedia('(hover: hover) and (pointer: fine)').matches;
 let layer = null;
 let items = [];
 let byLink = new Map();
-let hovered = null;
+let hovered = null; // by mouse or keyboard focus
+let tapped = null; // touch: the item whose link was tapped once
+let armed = null; //  touch: that link, which opens on the next tap
 let wide = true;
 let raf = 0;
 let lastT = 0;
@@ -65,7 +73,6 @@ function build() {
         vel: 0,
         near: 0,
         lit: 0,
-        hover: 0,
         drawn: '',
       };
       bySrc.set(src, item);
@@ -85,7 +92,9 @@ function teardown() {
   layer = null;
   items = [];
   byLink = new Map();
-  hovered = null;
+  hovered = tapped = null;
+  armed?.classList.remove('armed');
+  armed = null;
 }
 
 function layout() {
@@ -136,6 +145,14 @@ function frame(now) {
   const litTo = wide ? 1 : 0.8; // on narrow screens the images sit under the text
   let busy = false;
 
+  if (!mouse && flame.on) {
+    // On touch screens the hovering torch is the pointer.
+    pointer.x = flame.x;
+    pointer.y = flame.y;
+    pointer.in = true;
+  }
+  const reach = mouse ? 240 : 170; // on phones, about as far as the flame's glow is seen
+
   for (const it of items) {
     // Each image hangs on a spring: it lags when the page moves, then bobs back.
     if (it.bob) {
@@ -151,14 +168,16 @@ function frame(now) {
     let near = 0;
     if (pointer.in) {
       const d = Math.max(0, Math.hypot(pointer.x - it.x, pointer.y - cy) - it.w * 0.4);
-      near = Math.max(0, 1 - d / 240) ** 2;
+      near = Math.max(0, 1 - d / reach) ** 2;
     }
+    // Hovered or tapped: fully lit. On touch screens, torchlight lights pictures partway, by nearness.
+    const want = it === hovered || it === tapped ? 1 : mouse ? 0 : near * 0.75;
     it.near += (near - it.near) * (1 - 0.01 ** dt);
-    it.lit += (it.hover - it.lit) * (1 - (it.hover ? 1e-5 : 0.01) ** dt); // quick to light, slow to fade
+    it.lit += (want - it.lit) * (1 - (want > it.lit ? 1e-5 : 0.01) ** dt); // quick to light, slow to fade
     if (Math.abs(near - it.near) > 0.002) busy = true;
     else it.near = near;
-    if (Math.abs(it.hover - it.lit) > 0.002) busy = true;
-    else it.lit = it.hover;
+    if (Math.abs(want - it.lit) > 0.002) busy = true;
+    else it.lit = want;
 
     if (cy < -300 || cy > vh + 300) continue; // off screen: skip the style writes
     const scale = still ? 1 : 1 + it.lit * 0.05;
@@ -177,9 +196,13 @@ function frame(now) {
 function setHover(link) {
   const item = (link && byLink.get(link)) || null;
   if (item === hovered) return;
-  if (hovered) hovered.hover = 0;
   hovered = item;
-  if (item) item.hover = 1;
+  wake();
+}
+
+function disarm() {
+  armed?.classList.remove('armed');
+  armed = tapped = null;
   wake();
 }
 
@@ -202,7 +225,21 @@ export function initCollage() {
   document.addEventListener('focusin', (e) => setHover(e.target.closest?.('a[data-img]')));
   document.addEventListener('focusout', () => setHover(null));
 
-  if (!mouse) return;
+  if (!mouse) {
+    addEventListener('torch:lit', wake);
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest?.('#content a[data-img]');
+      if (link && link === armed) return disarm(); // the second tap: let the link open
+      disarm();
+      if (!link || !byLink.has(link)) return;
+      e.preventDefault(); // the first tap only lights the picture
+      armed = link;
+      armed.classList.add('armed');
+      tapped = byLink.get(link);
+      wake();
+    });
+    return;
+  }
   addEventListener(
     'pointermove',
     (e) => {

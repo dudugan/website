@@ -6,6 +6,34 @@ Working assumptions that haven't been approved yet stay in [PLAN.md](PLAN.md) un
 
 ---
 
+## 2026-09-26: the loader can't be skipped; tap names on phones
+
+### Decided by you
+- **Clicking the loading screen no longer skips it.** It runs its course: at least 4.3 s, at most 8 s.
+- **On phones, tapping a being shows its name.** The name stays until you tap another being or empty space.
+
+## 2026-09-26: /influences on phones: torchlight and tap to preview
+
+### Decided by you
+- **The torch lights pictures as you scroll.** On touch screens, pictures passing near the torch at the bottom of the screen light up, in colour, the more the closer, whichever link they belong to. (A first version lit the picture of whichever link passed nearest the flame instead.)
+- **Pictured links take two taps.** The first tap on a link lights its picture fully instead of opening it; a second tap on the same link opens it.
+
+### Proposed by Claude while building (tell me if you want any of these changed)
+- **Torchlight lights a picture at most 75%** and reaches about 170 px, roughly as far as the flame's glow shows on a phone. It's automatic, so it stays a little quieter than a chosen tap.
+- **The armed link gets a solid underline**, as a cue that the next tap opens it.
+- **Tapping another link moves the highlight to it; tapping anywhere else clears it.**
+- **Links without pictures, and everything on desktop, work as before.**
+
+## 2026-09-26: the torch on phones
+
+### Decided by you
+- **On touch screens the torch hovers near the bottom of the screen.** Phones used to have no torch at all.
+
+### Proposed by Claude while building (tell me if you want any of these changed)
+- **Placement:** it's centred about 56 px above the bottom edge, at 60% of its desktop size, so the glow doesn't swamp a small screen.
+- **Movement:** it drifts a few pixels on slow, uneven loops, and reduced motion holds it still.
+- **Mouse and trackpad computers are unchanged.** The torch follows the cursor there.
+
 ## 2026-09-26: habit clicks leave the music alone
 
 ### Decided by you
