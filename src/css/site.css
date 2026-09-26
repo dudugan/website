@@ -390,6 +390,7 @@ footer {
   z-index: 100;
   display: grid;
   place-items: center;
+  place-content: center; /* the drawing and the name line below it sit together in the middle */
   background: var(--bg);
   transition: opacity 0.8s ease;
 }
@@ -404,6 +405,17 @@ footer {
   width: min(94vw, 1080px);
   height: auto;
   overflow: visible;
+}
+#loader .species {
+  height: 1.4em; /* kept even when empty, so nothing shifts when a name appears */
+  margin: 1.1rem 0 0;
+  font: italic 1.15rem/1.4 var(--serif);
+  color: var(--ink);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+#loader .species.shown {
+  opacity: 0.85;
 }
 
 /* ---------- sound: playing / not playing, bottom right ---------- */

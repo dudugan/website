@@ -22,7 +22,7 @@ See more on [my older website](https://dudugan.github.io).
 
 # music
 
-See also [amoriem labs](https://amoriem-labs.github.io) and some [daily improvizations](https://www.youtube.com/@davidgetsbetteratcomposing/shorts).
+See also some [daily improvizations](https://www.youtube.com/@davidgetsbetteratcomposing/shorts).
 
 **>** [sinkholes, tethers, \[catharsis\]](https://www.cortexmagazine.com/vii-sinkholes-tethers-catharsis). 2026. *Music (alongside art & short story).* With Joy Zhou and Emily Yu.
 
@@ -52,7 +52,7 @@ See also [amoriem labs](https://amoriem-labs.github.io) and some [daily improviz
 
 # writing
 
-See also [the cortex collective](https://www.cortexmagazine.com) and [my old conlanging channel](https://www.youtube.com/@simulanger).
+See also [my old conlanging channel](https://www.youtube.com/@simulanger).
 
 **>** [Visions](https://www.amazon.com/Visions-VI-Cortex-Collective/dp/B0FNQRNRZ5?asin=B0FNQRNRZ5&revisionId=&format=4&depth=1). 2025. *Print issue.* Vol. VI of the Cortex Collective.
 

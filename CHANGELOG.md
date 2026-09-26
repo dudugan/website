@@ -6,6 +6,36 @@ Working assumptions that haven't been approved yet stay in [PLAN.md](PLAN.md) un
 
 ---
 
+## 2026-09-26: species names on the loader, flat tracker squares
+
+### Decided by you
+- **Hovering a being in the loader shows its species name in italics.** The pequeniño is "pequeniño" and the robot is "robot".
+  - The names appear in one shared line, centred a little below the whole procession, since only one shows at a time.
+  - They're about 21 px, much bigger than the first version drawn inside the picture.
+- **The tracker is back to separate squares, like GitHub's contribution map.**
+  - Done days are in the habit's colour.
+  - Missed days inside a streak are a solid, dimmer shade of the habit's colour. (Tried first at 50% and then 25% opacity.)
+  - Done days are a little brighter than the first flat version.
+  - Every square is one flat colour, with no gradient, texture, or animation.
+
+### Proposed by Claude while building (tell me if you want any of these changed)
+- **The names:**
+  - raven *Corvus corax*
+  - caveman *Homo neanderthalensis*
+  - jumping spider *Phidippus audax* (the bold jumper)
+  - boy *Homo sapiens*
+  - dolphin *Tursiops truncatus* (bottlenose)
+  - *Homo naledi*
+  - elephant *Loxodonta africana* (African, for its big ear)
+- **The name line is plain page text, outside the drawing**, so it keeps the same size on any screen and doesn't wobble with the line boil. Each being's hover area covers its whole drawing.
+- **Each habit's two colours (done / missed in a streak):**
+  - teal #439387 / #26403c
+  - purple #6e488f / #34283e
+  - ember #9f5236 / #442b22
+  - green #498d53 / #283e2c
+  - gold #9c7e3b / #433923
+  - blue #426395 / #263040
+
 ## 2026-09-26: connected marble streaks, creative work on /past-lives
 
 ### Decided by you

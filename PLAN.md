@@ -8,7 +8,7 @@ Brief: [SPEC.md](SPEC.md) · Changes since the brief: [CHANGELOG.md](CHANGELOG.m
 - **Content:** each page is one `.md` file in `content/` that holds only its content (no front matter). A single HTML template renders all of them.
 - **Animation:** every animation loops, lasts at most 7 s per cycle, and moves very little: flutters and small motions that settle back into place. Visitors with `prefers-reduced-motion` get a still version.
 - **Art:** it should look hand-drawn, after Giraud/Moebius, Miyazaki, McCay, Jansson, and Sempé.
-- **Layout:** minimal, like nel.ag and jia.build. At rest it's black and white. The only colours are the torch's fire, the teal gradient on bold text, and the marble of the habit tracker. A collage picture turns to full colour only while its link is hovered.
+- **Layout:** minimal, like nel.ag and jia.build. At rest it's black and white. The only colours are the torch's fire, the teal gradient on bold text, and the flat colours of the habit tracker. A collage picture turns to full colour only while its link is hovered.
 - **No-JS baseline:** with JavaScript off, all text and links still work. Every effect is layered on top of that.
 
 ---
@@ -86,6 +86,7 @@ website/
    - the raven hops, the caveman nods, the spider hops
    - the boy and naledi bob, the dolphin arcs, the pequeniño twitches its ears
    - the robot tilts its head, and the elephant swings its trunk and flaps an ear.
+24b. `[x]` Hovering a being shows its species name in italics, in one line centred under the procession (pequeniño and robot are named just that).
 25. `[x]` It shows on the first page of a visit, and again on every reload (never when moving to another page). It stays up until the page has loaded and at least 2.3 s have passed (6 s at most), then fades over 0.8 s. Clicking it skips it. Lines get heavier on phones.
 
 ### Phase 9: Music
@@ -106,8 +107,7 @@ website/
 
 ### Phase 9d: Habit tracker
 28e. `[x]` `content/habits.json` holds the habits: name, colour, max-gap, and the days done. One renderer (`src/js/habits.js`) draws it at build time and again in the browser, so the rightmost column is always today.
-   - Each day is a small rounded square. A streak joins its squares into one rounded bar, with missed days in dimmed stone.
-   - The colour is still marble: grainy stone with busy clouding, fine pale veins, and flecks. Nothing is animated.
+   - Each day is a small rounded square, GitHub-style. Done days are in the habit's flat colour, and missed days inside a streak are a solid, dimmer shade of it.
    - The squares are 16 px, so the full column shows about 29 days on desktop. It sits at the top of /now.
    - Hovering shows the habit's name (left) and the date (right).
    - You can scroll or drag sideways through the dates.

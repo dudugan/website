@@ -1,6 +1,6 @@
 // Habit tracker: one row per habit, one small square per day, today at the right edge.
-// Done days are little marble tiles in the habit's colour; a streak (misses no longer than the
-// habit's max-gap) joins its squares into one rounded bar, with the missed days dimmed. The same
+// Done days are squares in the habit's colour; inside a streak (misses no longer than the
+// habit's max-gap) the missed days are squares in a dimmer shade of it. The same
 // renderer runs at build time (so the page works without JS) and in the browser (so the
 // last column is always the visitor's today).
 //
@@ -8,23 +8,20 @@
 // this repo's contents. The squares become clickable, and clicks are committed to
 // content/habits.json through the GitHub API, which redeploys the site.
 
-// Stones that sit back in the black: the base colour, lighter and darker clouding, and the
-// pale veins and flecks that run through it.
+// Two flat colours per habit: done days, and the missed days inside a streak.
 export const PALETTES = {
-  teal: { stone: '#3a746b', cloud: '#4e8d8c', shadow: '#244c4a', vein: '#acc3c0' },
-  purple: { stone: '#593e70', cloud: '#745389', shadow: '#3c264a', vein: '#b8adc2' },
-  ember: { stone: '#7d442f', cloud: '#9a6140', shadow: '#532f1d', vein: '#c8b0a7' },
-  green: { stone: '#3f6f46', cloud: '#548761', shadow: '#27492e', vein: '#aec1b0' },
-  gold: { stone: '#7b6533', cloud: '#978545', shadow: '#51451f', vein: '#c6bea9' },
-  blue: { stone: '#395175', cloud: '#4b608f', shadow: '#23314e', vein: '#abb5c4' },
+  teal: { done: '#439387', gap: '#26403c' },
+  purple: { done: '#6e488f', gap: '#34283e' },
+  ember: { done: '#9f5236', gap: '#442b22' },
+  green: { done: '#498d53', gap: '#283e2c' },
+  gold: { done: '#9c7e3b', gap: '#433923' },
+  blue: { done: '#426395', gap: '#263040' },
 };
 
 const S = 16; // square
 const GAP = 4;
 const STEP = S + GAP;
 const R = 4; // corner radius
-const SLAB_W = 12 * STEP; // one tile of marble; every square of a colour is cut from it
-const SLAB_H = 6 * STEP;
 const DAY = 86400000;
 
 export const dayOf = (iso) => {
@@ -79,24 +76,13 @@ function streaksOf(days, maxGap, today) {
   const out = [];
   for (const d of days) {
     const s = out.at(-1);
-    if (s && d - s.end - 1 <= maxGap) {
-      const run = s.runs.at(-1);
-      if (d === run[1] + 1) run[1] = d;
-      else s.runs.push([d, d]);
-      s.end = d;
-    } else out.push({ start: d, end: d, runs: [[d, d]] });
+    if (s && d - s.end - 1 <= maxGap) s.end = d;
+    else out.push({ start: d, end: d });
   }
   for (const s of out) s.to = s.end;
   const last = out.at(-1);
   if (last && today - last.end - 1 <= maxGap) last.to = today; // still alive: today can carry it on
   return out;
-}
-
-// A rectangle whose left and right corners can be rounded separately.
-function bar(x, y, w, h, rl, rr) {
-  const right = rr ? `A${rr},${rr} 0 0 1 ${x + w},${y + rr}V${y + h - rr}A${rr},${rr} 0 0 1 ${x + w - rr},${y + h}` : `V${y + h}`;
-  const left = rl ? `A${rl},${rl} 0 0 1 ${x},${y + h - rl}V${y + rl}A${rl},${rl} 0 0 1 ${x + rl},${y}` : `V${y}`;
-  return `M${x + rl},${y}H${x + w - rr}${right}H${x + rl}${left}Z`;
 }
 
 export function renderTracker({ habits }, today) {
@@ -108,62 +94,23 @@ export function renderTracker({ habits }, today) {
   const h = Math.max(1, habits.length) * STEP - GAP;
   const x = (d) => (d - start) * STEP;
 
-  const used = new Set();
   const body = [`<rect width="${w}" height="${h}" fill="url(#habit-off)"/>`];
   habits.forEach((habit, r) => {
     const y = r * STEP;
-    const stone = `url(#habit-${habit.color})`;
-    used.add(habit.color);
+    const colours = PALETTES[habit.color];
+    const done = new Set(days[r]);
     for (const s of streaksOf(days[r], habit.maxGap, today)) {
-      const span = (a, b, rl, rr) => bar(x(a), y, x(b) + S - x(a), S, rl, rr);
-      if (s.to !== s.start) {
-        // Blank out the empty squares underneath, then lay the whole streak in dimmed stone.
-        body.push(`<path d="${span(s.start, s.to, R, R)}" fill="#000"/>`);
-        body.push(`<path d="${span(s.start, s.to, R, R)}" fill="${stone}" fill-opacity="0.4"/>`);
+      for (let d = s.start; d <= s.to; d++) {
+        const fill = done.has(d) ? colours.done : colours.gap;
+        body.push(`<rect x="${x(d)}" y="${y}" width="${S}" height="${S}" rx="${R}" fill="${fill}"/>`);
       }
-      for (const [a, b] of s.runs) body.push(`<path d="${span(a, b, a === s.start ? R : 0, b === s.to ? R : 0)}" fill="${stone}"/>`);
     }
   });
 
   const off = `<pattern id="habit-off" width="${STEP}" height="${STEP}" patternUnits="userSpaceOnUse"><rect width="${S}" height="${S}" rx="${R}" fill="#171717"/></pattern>`;
   return (
     `<svg class="habits-grid" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" data-start="${start}" data-days="${n}" aria-hidden="true">` +
-    `<defs>${off}${[...used].map(marble).join('')}</defs>${body.join('')}</svg>`
-  );
-}
-
-// Marble, drawn once per colour into a tile, from four noise fields: busy lighter and darker
-// clouding; fine pale veins traced along contour lines of a second field; and a grain of pale
-// flecks and dark pits. The tile is a whole number of squares across and down, so its edges
-// fall in the gaps between squares. Nothing moves: the browser paints the tile once.
-function marble(name) {
-  const { stone, cloud, shadow, vein } = PALETTES[name];
-  let seed = 7;
-  for (const ch of name) seed = (seed * 31 + ch.charCodeAt(0)) % 997;
-  const paint = (hex, alpha) => {
-    const [r, g, b] = [1, 3, 5].map((i) => (parseInt(hex.slice(i, i + 2), 16) / 255).toFixed(3));
-    return `0 0 0 0 ${r} 0 0 0 0 ${g} 0 0 0 0 ${b} ${alpha}`;
-  };
-  // A transfer table that is 1 only at one level of a field (0–1), and 0 everywhere else.
-  const contour = (level, steps = 41) => Array.from({ length: steps }, (_, i) => +(Math.round(level * (steps - 1)) === i)).join(' ');
-  return (
-    `<filter id="habit-${name}-stone" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">` +
-    `<feTurbulence type="fractalNoise" baseFrequency="0.035 0.06" numOctaves="5" seed="${seed}" stitchTiles="stitch" result="clouds"/>` +
-    `<feColorMatrix in="clouds" values="${paint(cloud, '3.2 0 0 0 -1.3')}" result="light"/>` +
-    `<feColorMatrix in="clouds" values="${paint(shadow, '0 3.2 0 0 -1.3')}" result="dark"/>` +
-    `<feTurbulence type="fractalNoise" baseFrequency="0.022 0.04" numOctaves="5" seed="${seed + 3}" stitchTiles="stitch" result="field"/>` +
-    `<feComponentTransfer in="field" result="contours">` +
-    `<feFuncR type="table" tableValues="${contour(0.5)}"/><feFuncG type="table" tableValues="${contour(0.44)}"/>` +
-    `<feFuncB type="table" tableValues="${contour(0.56)}"/><feFuncA type="table" tableValues="${contour(0.5)}"/></feComponentTransfer>` +
-    `<feColorMatrix in="contours" values="${paint(vein, '0.85 0.55 0.4 0.3 0')}" result="veins"/>` +
-    `<feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="${seed + 5}" stitchTiles="stitch" result="grain"/>` +
-    `<feColorMatrix in="grain" values="${paint(vein, '1.4 0 0 0 -0.72')}" result="flecks"/>` +
-    `<feColorMatrix in="grain" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.4 0 0 -0.72" result="pits"/>` +
-    `<feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="light"/><feMergeNode in="dark"/>` +
-    `<feMergeNode in="veins"/><feMergeNode in="flecks"/><feMergeNode in="pits"/></feMerge>` +
-    `</filter>` +
-    `<pattern id="habit-${name}" width="${SLAB_W}" height="${SLAB_H}" patternUnits="userSpaceOnUse">` +
-    `<rect width="${SLAB_W}" height="${SLAB_H}" fill="${stone}" filter="url(#habit-${name}-stone)"/></pattern>`
+    `<defs>${off}</defs>${body.join('')}</svg>`
   );
 }
 

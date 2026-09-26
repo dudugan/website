@@ -287,17 +287,22 @@ const elephant = [
   hatch('M86,-165 C90,-167 95,-166 98,-163 M88,-155 C92,-153 96,-154 98,-157'),
 ];
 
-const figures = [
-  figure(0, 60, 'hop', ...raven),
-  figure(1, 180, 'bob', ...caveman),
-  figure(2, 295, 'hop', ...spider),
-  figure(3, 398, 'bob', ...boy),
-  figure(4, 530, 'bob', ...dolphin),
-  figure(5, 668, 'bob', ...pequenino),
-  figure(6, 775, 'bob', ...robot),
-  figure(7, 890, 'bob', ...naledi),
-  figure(8, 1085, 'bob', ...elephant),
+const beings = [
+  [60, 'hop', raven, 'Corvus corax'],
+  [180, 'bob', caveman, 'Homo neanderthalensis'],
+  [295, 'hop', spider, 'Phidippus audax'],
+  [398, 'bob', boy, 'Homo sapiens'],
+  [530, 'bob', dolphin, 'Tursiops truncatus'],
+  [668, 'bob', pequenino, 'pequeniño'],
+  [775, 'bob', robot, 'robot'],
+  [890, 'bob', naledi, 'Homo naledi'],
+  [1085, 'bob', elephant, 'Loxodonta africana'],
 ];
+const figures = beings.map(([x, cls, body], i) => figure(i, x, cls, ...body));
+
+// Hover areas, one per being, carrying its name; loader.js sizes each to its figure once the
+// drawing is on screen, and shows the hovered name in the single line under the procession.
+const hits = beings.map(([x, , , name]) => `<rect class="hit" transform="translate(${x} ${GROUND})" data-name="${name}"/>`);
 
 const style = `
 .procession { --ow: 2.2; --beat: 3.6s; }
@@ -329,6 +334,8 @@ const style = `
 @keyframes pr-trunk { 0%, 20%, 100% { transform: none; } 10% { transform: rotate(6deg); } }
 @keyframes pr-ear { 0%, 18%, 100% { transform: none; } 9% { transform: scaleX(0.9); } }
 
+.procession .hit { fill: transparent; pointer-events: all; }
+
 @media (max-width: 700px) { .procession { --ow: 3.4; } }
 `;
 
@@ -346,4 +353,6 @@ export default `<svg class="procession" viewBox="0 30 1240 232" role="img" aria-
   <path class="ground" d="M8,${GROUND + 1} C300,${GROUND} 600,${GROUND + 2} 900,${GROUND + 0.5} S1180,${GROUND + 1.5} 1232,${GROUND + 1}"/>
   ${figures.join('\n  ')}
 </g>
-</svg>`;
+${hits.join('\n')}
+</svg>
+<p class="species"></p>`;
