@@ -6,6 +6,44 @@ Working assumptions that haven't been approved yet stay in [PLAN.md](PLAN.md) un
 
 ---
 
+## 2026-09-26: connected marble streaks, creative work on /past-lives
+
+### Decided by you
+- **Streaks are joined bars again, now in still marble** instead of the lines through separate squares.
+- **The marble is a little brighter, and grainy and detailed rather than smooth.** It has busier clouding, many fine veins, and pale flecks and dark pits.
+- **/past-lives lists your creative work** from your old site's creative page, in the same format: `> Title. Year. Type. Credits.`
+  - Music: 13 pieces.
+  - Writing: 10, including the poetry.
+  - Web design: 6.
+
+### Proposed by Claude while building (tell me if you want any of these changed)
+- **Missed days inside a streak show the same stone at 40%.**
+- **Where pieces went:**
+  - Pieces are sorted by what their type says first.
+  - Writing: the conlang relay translations, the Visions print issue, and the three conlang poetry videos.
+  - Music: the Old Babylonian rap.
+  - Web design: Mutation(s) ("music & website"), Nucleica, and Gobbler.
+- **The old page's "See also" line is split in two.** amoriem labs and the daily improvisations go under music; the Cortex Collective and the conlanging channel go under writing. The "audio player under construction" note is left out.
+- **The Pokémon site's link** was relative on your old site (`404.html`), so it now points at `dudugan.github.io/404.html` to keep working the same way.
+
+## 2026-09-26: folding sections on /past-lives, linked connections, marble tracker
+
+### Decided by you
+- **On /past-lives, the research, music, writing, and web design sections are hidden until clicked.** The words in "See below my research, music, writing, and web design" open them.
+- **All 18 connections on /past-lives are linked.** 17 come from your old site's affiliations page. Yale AI Alignment (yaleaia.org) was found by search.
+- **The tracker's squares are still marble, not animated gradients.** Each colour is a dark stone with lighter and darker clouding and thin pale veins, and every square shows a different part of the slab.
+
+### Proposed by Claude while building (tell me if you want any of these changed)
+- **One section is open at a time.** Clicking the open one's word folds it again, and the open word is fully underlined.
+  - The address shows the open section (`/past-lives#music`), so a link to it opens it directly.
+  - Without JS, all sections show.
+  - This works on any page: link to a heading on the same page and that heading's section folds.
+- **Link choices:**
+  - The Center for Collaborative Arts & Media links to ccam.yale.edu. Your old profile page there now says "Access denied".
+  - BlueDot Impact links to its homepage rather than the course page.
+- **Fixed:** a page's browser-tab title used to come from its first top-level heading anywhere on the page, so /past-lives was titled "research". Now a heading names the page only if the page opens with it.
+- **The dev server picks up edits to the build script itself** without a restart.
+
 ## 2026-09-26: separate squares with streak lines, more pictures
 
 ### Decided by you

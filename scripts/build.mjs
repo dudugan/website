@@ -62,6 +62,43 @@ async function assertSingleTemplate() {
   if (extra.length) throw new Error(`Only src/layout.html may exist as HTML source. Found: ${extra.join(', ')}`);
 }
 
+const headingId = (text) =>
+  text
+    .toLowerCase()
+    .replace(/<[^>]+>/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+
+// A heading the page itself links to (#its-id) starts folded away, with everything under it
+// up to the next heading of its rank or higher; its link unfolds it (src/js/folds.js).
+// Without JS nothing is hidden, and the links just jump.
+function renderWithFolds(marked, md) {
+  const tokens = marked.lexer(md);
+  const targets = new Set([...md.matchAll(/\]\(#([^)\s]+)\)/g)].map((m) => m[1]));
+  const html = [];
+  let run = [];
+  let fold = null;
+  const render = (list) => marked.parser(Object.assign(list, { links: tokens.links }));
+  const flush = () => {
+    if (run.length) html.push(render(run));
+    run = [];
+  };
+  const close = () => {
+    if (fold) html.push(`<section class="fold">\n${render(fold.tokens)}</section>\n`);
+    fold = null;
+  };
+  for (const t of tokens) {
+    if (fold && t.type === 'heading' && t.depth <= fold.depth) close();
+    if (t.type === 'heading' && targets.has(headingId(t.text))) {
+      flush();
+      fold = { depth: t.depth, tokens: [t] };
+    } else (fold ? fold.tokens : run).push(t);
+  }
+  flush();
+  close();
+  return html.join('');
+}
+
 function markdownRenderer(base, linkImages) {
   const marked = new Marked({ gfm: true });
   const local = (href) => (href.startsWith('/') && !href.startsWith('//') ? base + href : href);
@@ -78,6 +115,9 @@ function markdownRenderer(base, linkImages) {
           image ? `data-img="${escapeHtml(image)}"` : '',
         ].filter(Boolean);
         return `<a ${attrs.join(' ')}>${text}</a>`;
+      },
+      heading({ tokens, depth, text }) {
+        return `<h${depth} id="${headingId(text)}">${this.parser.parseInline(tokens)}</h${depth}>\n`;
       },
       image({ href, title, text }) {
         const t = title ? ` title="${escapeHtml(title)}"` : '';
@@ -164,7 +204,7 @@ export async function build({ base = process.env.BASE_PATH ?? '', quiet = false 
   const habits = habitsText && parseHabits(habitsText);
   const remote = { repo: config.repo, branch: 'main', file: 'content/habits.json' };
   const parse = (md, where) => {
-    const html = marked.parse(md);
+    const html = renderWithFolds(marked, md);
     if (!html.includes('<!-- habits -->')) return html;
     if (!habits) throw new Error(`${where} asks for <!-- habits --> but content/habits.json is missing`);
     return html.replace('<!-- habits -->', trackerFigure(habits, localToday(), remote));
@@ -174,7 +214,9 @@ export async function build({ base = process.env.BASE_PATH ?? '', quiet = false 
   for (const file of pages) {
     const slug = file.replace(/\.md$/, '');
     const md = await readFile(at('content', file), 'utf8');
-    const heading = marked.lexer(md).find((t) => t.type === 'heading' && t.depth === 1);
+    // A top-level heading names the page only when the page opens with it.
+    const opening = marked.lexer(md).find((t) => t.type !== 'space');
+    const heading = opening?.type === 'heading' && opening.depth === 1 ? opening : null;
     const title = slug === 'index' ? config.name : `${heading ? heading.text : labelFor(slug)} — ${config.name}`;
     await writeFile(at('dist', `${slug}.html`), render({ slug, title, content: parse(md, `content/${file}`) }));
   }

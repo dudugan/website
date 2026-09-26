@@ -8,7 +8,6 @@ import { readFile, stat } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { dirname, extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { build } from './build.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = join(root, 'dist');
@@ -80,6 +79,8 @@ const server = createServer(async (req, res) => {
 
 async function rebuild() {
   try {
+    // A fresh import each time, so edits to the build script itself apply without a restart.
+    const { build } = await import(`./build.mjs?t=${Date.now()}`);
     await build({ base: '' });
     for (const res of clients) res.write('data: reload\n\n');
   } catch (err) {

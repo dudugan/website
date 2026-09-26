@@ -8,7 +8,7 @@ Brief: [SPEC.md](SPEC.md) · Changes since the brief: [CHANGELOG.md](CHANGELOG.m
 - **Content:** each page is one `.md` file in `content/` that holds only its content (no front matter). A single HTML template renders all of them.
 - **Animation:** every animation loops, lasts at most 7 s per cycle, and moves very little: flutters and small motions that settle back into place. Visitors with `prefers-reduced-motion` get a still version.
 - **Art:** it should look hand-drawn, after Giraud/Moebius, Miyazaki, McCay, Jansson, and Sempé.
-- **Layout:** minimal, like nel.ag and jia.build. At rest it's black and white. The only colours are the torch's fire and the teal gradient on bold text. A collage picture turns to full colour only while its link is hovered.
+- **Layout:** minimal, like nel.ag and jia.build. At rest it's black and white. The only colours are the torch's fire, the teal gradient on bold text, and the marble of the habit tracker. A collage picture turns to full colour only while its link is hovered.
 - **No-JS baseline:** with JavaScript off, all text and links still work. Every effect is layered on top of that.
 
 ---
@@ -98,13 +98,16 @@ website/
 28b. `[x]` `collage.js` places each picture beside its link, grey and faint. It drifts with scroll, and some pictures bob on springs and settle within about 1 s. Pictures brighten near the torch, and a hovered or focused link brings its picture up in colour. The collage is rebuilt on every page swap and is off without JS.
 28c. `[x]` Every link has a picture. Most are ones you picked, resized to 320 px.
 
+### Phase 9e: Folding sections
+28g. `[x]` Any heading a page links to (`[music](#music)`) is built as a folded section. It stays hidden until its link is clicked, and only one is open at a time. The address updates (`/past-lives#music`), so a section can be linked to directly. Without JS, every section shows. This is used on /past-lives.
+
 ### Phase 9c: Writings
 28d. `[x]` Posts are `content/writings/YYYY-MM-DD-slug.md`, with the first `# heading` as the title. The build writes one page per post plus a newest-first list at `/writings`, and "writings" is in the nav. There are two example posts.
 
 ### Phase 9d: Habit tracker
 28e. `[x]` `content/habits.json` holds the habits: name, colour, max-gap, and the days done. One renderer (`src/js/habits.js`) draws it at build time and again in the browser, so the rightmost column is always today.
-   - Each day is a small rounded square, and only done days are coloured. A streak is strung together by a thin solid line through the middle, which also runs across its missed days.
-   - Colours are dark and faded, and flow like liquid: two drifting gradient layers per colour, each looping in under 7 s.
+   - Each day is a small rounded square. A streak joins its squares into one rounded bar, with missed days in dimmed stone.
+   - The colour is still marble: grainy stone with busy clouding, fine pale veins, and flecks. Nothing is animated.
    - The squares are 16 px, so the full column shows about 29 days on desktop. It sits at the top of /now.
    - Hovering shows the habit's name (left) and the date (right).
    - You can scroll or drag sideways through the dates.

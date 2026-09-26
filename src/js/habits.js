@@ -1,6 +1,6 @@
 // Habit tracker: one row per habit, one small square per day, today at the right edge.
-// Done days fill with the habit's colour; a streak (misses no longer than the habit's
-// max-gap) is strung together by a thin line through the middle of its squares. The same
+// Done days are little marble tiles in the habit's colour; a streak (misses no longer than the
+// habit's max-gap) joins its squares into one rounded bar, with the missed days dimmed. The same
 // renderer runs at build time (so the page works without JS) and in the browser (so the
 // last column is always the visitor's today).
 //
@@ -8,23 +8,23 @@
 // this repo's contents. The squares become clickable, and clicks are committed to
 // content/habits.json through the GitHub API, which redeploys the site.
 
-// Dark, faded colours that sit back in the black: six shades each for the flowing base,
-// plus a light and a deep tone for the sheen that drifts across it.
+// Stones that sit back in the black: the base colour, lighter and darker clouding, and the
+// pale veins and flecks that run through it.
 export const PALETTES = {
-  teal: { shades: ['#325d57', '#254b43', '#42706f', '#2b5449', '#1f4240', '#3c6162'], light: '#5d9890', deep: '#0e1b19' },
-  purple: { shades: ['#49355a', '#362749', '#5e466d', '#3c2e52', '#342140', '#553f5f'], light: '#7c6293', deep: '#150f1a' },
-  ember: { shades: ['#653929', '#52281e', '#7b5037', '#5c2b24', '#482919', '#6c4b33'], light: '#a6664e', deep: '#1d100c' },
-  green: { shades: ['#36593b', '#28482a', '#476b50', '#2f502f', '#223f28', '#415d49'], light: '#64906a', deep: '#101911' },
-  gold: { shades: ['#63522c', '#503e21', '#786b3b', '#594326', '#463c1b', '#686236'], light: '#a28a53', deep: '#1c180d' },
-  blue: { shades: ['#31435e', '#24374c', '#404f72', '#2a4155', '#1e2a43', '#3a4464'], light: '#5b749a', deep: '#0e131b' },
+  teal: { stone: '#3a746b', cloud: '#4e8d8c', shadow: '#244c4a', vein: '#acc3c0' },
+  purple: { stone: '#593e70', cloud: '#745389', shadow: '#3c264a', vein: '#b8adc2' },
+  ember: { stone: '#7d442f', cloud: '#9a6140', shadow: '#532f1d', vein: '#c8b0a7' },
+  green: { stone: '#3f6f46', cloud: '#548761', shadow: '#27492e', vein: '#aec1b0' },
+  gold: { stone: '#7b6533', cloud: '#978545', shadow: '#51451f', vein: '#c6bea9' },
+  blue: { stone: '#395175', cloud: '#4b608f', shadow: '#23314e', vein: '#abb5c4' },
 };
 
 const S = 16; // square
 const GAP = 4;
 const STEP = S + GAP;
 const R = 4; // corner radius
-const PERIOD = 160; // width of one sweep through a colour's shades
-const SHEEN = 64; // width of one band of the sheen
+const SLAB_W = 12 * STEP; // one tile of marble; every square of a colour is cut from it
+const SLAB_H = 6 * STEP;
 const DAY = 86400000;
 
 export const dayOf = (iso) => {
@@ -79,8 +79,12 @@ function streaksOf(days, maxGap, today) {
   const out = [];
   for (const d of days) {
     const s = out.at(-1);
-    if (s && d - s.end - 1 <= maxGap) s.end = d;
-    else out.push({ start: d, end: d });
+    if (s && d - s.end - 1 <= maxGap) {
+      const run = s.runs.at(-1);
+      if (d === run[1] + 1) run[1] = d;
+      else s.runs.push([d, d]);
+      s.end = d;
+    } else out.push({ start: d, end: d, runs: [[d, d]] });
   }
   for (const s of out) s.to = s.end;
   const last = out.at(-1);
@@ -88,7 +92,14 @@ function streaksOf(days, maxGap, today) {
   return out;
 }
 
-export function renderTracker({ habits }, today, { animate = true } = {}) {
+// A rectangle whose left and right corners can be rounded separately.
+function bar(x, y, w, h, rl, rr) {
+  const right = rr ? `A${rr},${rr} 0 0 1 ${x + w},${y + rr}V${y + h - rr}A${rr},${rr} 0 0 1 ${x + w - rr},${y + h}` : `V${y + h}`;
+  const left = rl ? `A${rl},${rl} 0 0 1 ${x},${y + h - rl}V${y + rl}A${rl},${rl} 0 0 1 ${x + rl},${y}` : `V${y}`;
+  return `M${x + rl},${y}H${x + w - rr}${right}H${x + rl}${left}Z`;
+}
+
+export function renderTracker({ habits }, today) {
   const days = habits.map((h) => h.done.map(dayOf).filter((d) => d <= today));
   const first = Math.min(today, ...days.flat());
   const start = Math.min(first - 7, today - 83); // at least 12 weeks to scroll through
@@ -98,84 +109,62 @@ export function renderTracker({ habits }, today, { animate = true } = {}) {
   const x = (d) => (d - start) * STEP;
 
   const used = new Set();
-  const lines = [];
-  const squares = [];
+  const body = [`<rect width="${w}" height="${h}" fill="url(#habit-off)"/>`];
   habits.forEach((habit, r) => {
     const y = r * STEP;
-    const { shades } = PALETTES[habit.color];
+    const stone = `url(#habit-${habit.color})`;
     used.add(habit.color);
     for (const s of streaksOf(days[r], habit.maxGap, today)) {
-      if (s.to === s.start) continue;
-      const mid = y + S / 2;
-      lines.push(`<line x1="${x(s.start) + S / 2}" y1="${mid}" x2="${x(s.to) + S / 2}" y2="${mid}" stroke="${shades[2]}" stroke-width="2" stroke-linecap="round"/>`);
-    }
-    for (const d of days[r]) {
-      const square = `<rect x="${x(d)}" y="${y}" width="${S}" height="${S}" rx="${R}"`;
-      squares.push(`${square} fill="url(#habit-${habit.color})"/>${square} fill="url(#habit-${habit.color}-sheen)"/>`);
+      const span = (a, b, rl, rr) => bar(x(a), y, x(b) + S - x(a), S, rl, rr);
+      if (s.to !== s.start) {
+        // Blank out the empty squares underneath, then lay the whole streak in dimmed stone.
+        body.push(`<path d="${span(s.start, s.to, R, R)}" fill="#000"/>`);
+        body.push(`<path d="${span(s.start, s.to, R, R)}" fill="${stone}" fill-opacity="0.4"/>`);
+      }
+      for (const [a, b] of s.runs) body.push(`<path d="${span(a, b, a === s.start ? R : 0, b === s.to ? R : 0)}" fill="${stone}"/>`);
     }
   });
-  // The streak lines run under the squares, so they show in the gaps and across missed days.
-  const body = [`<rect width="${w}" height="${h}" fill="url(#habit-off)"/>`, ...lines, ...squares];
 
   const off = `<pattern id="habit-off" width="${STEP}" height="${STEP}" patternUnits="userSpaceOnUse"><rect width="${S}" height="${S}" rx="${R}" fill="#171717"/></pattern>`;
   return (
     `<svg class="habits-grid" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" data-start="${start}" data-days="${n}" aria-hidden="true">` +
-    `<defs>${off}${[...used].map((name) => gradients(name, animate)).join('')}</defs>${body.join('')}</svg>`
+    `<defs>${off}${[...used].map(marble).join('')}</defs>${body.join('')}</svg>`
   );
 }
 
-// Stable randomness per colour, so each row keeps its own currents from build to build.
-function seeded(str) {
-  let seed = 2166136261;
-  for (const ch of str) seed = Math.imul(seed ^ ch.charCodeAt(0), 16777619);
-  return () => {
-    seed = (seed + 0x6d2b79f5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+// Marble, drawn once per colour into a tile, from four noise fields: busy lighter and darker
+// clouding; fine pale veins traced along contour lines of a second field; and a grain of pale
+// flecks and dark pits. The tile is a whole number of squares across and down, so its edges
+// fall in the gaps between squares. Nothing moves: the browser paints the tile once.
+function marble(name) {
+  const { stone, cloud, shadow, vein } = PALETTES[name];
+  let seed = 7;
+  for (const ch of name) seed = (seed * 31 + ch.charCodeAt(0)) % 997;
+  const paint = (hex, alpha) => {
+    const [r, g, b] = [1, 3, 5].map((i) => (parseInt(hex.slice(i, i + 2), 16) / 255).toFixed(3));
+    return `0 0 0 0 ${r} 0 0 0 0 ${g} 0 0 0 0 ${b} ${alpha}`;
   };
-}
-
-// Wanders through a few random offsets on an uneven clock and comes back. Each loop is under
-// 7 s, like every animation on the site, but the base and the sheen run on different loop
-// lengths, so together they rarely repeat and the colour moves like liquid.
-function drift(rand, spanX, spanY) {
-  const legs = 4 + Math.floor(rand() * 3);
-  const lengths = Array.from({ length: legs }, () => 0.5 + rand());
-  const total = lengths.reduce((a, b) => a + b);
-  const values = ['0 0'];
-  const times = ['0'];
-  let t = 0;
-  for (let i = 1; i < legs; i++) {
-    t += lengths[i - 1] / total;
-    values.push(`${((rand() * 2 - 1) * spanX).toFixed(1)} ${((rand() * 2 - 1) * spanY).toFixed(1)}`);
-    times.push(t.toFixed(3));
-  }
-  values.push('0 0');
-  times.push('1');
-  const dur = (4.6 + rand() * 2.3).toFixed(2);
-  const ease = Array(legs).fill('0.4 0.1 0.6 0.9').join(';');
-  return `<animateTransform attributeName="gradientTransform" type="translate" values="${values.join(';')}" keyTimes="${times.join(';')}" calcMode="spline" keySplines="${ease}" dur="${dur}s" repeatCount="indefinite"/>`;
-}
-
-function gradients(name, animate) {
-  const { shades, light, deep } = PALETTES[name];
-  const rand = seeded(name);
-  const toward = (deg, len) => {
-    const a = (deg * Math.PI) / 180;
-    return `x2="${(Math.cos(a) * len).toFixed(1)}" y2="${(Math.sin(a) * len).toFixed(1)}"`;
-  };
-  const stops = (list) =>
-    list.map(([c, o], i) => `<stop offset="${(i / (list.length - 1)).toFixed(3)}" stop-color="${c}"${o < 1 ? ` stop-opacity="${o}"` : ''}/>`).join('');
-  const base =
-    `<linearGradient id="habit-${name}" gradientUnits="userSpaceOnUse" ${toward(8 + rand() * 20, PERIOD)} spreadMethod="reflect">` +
-    stops(shades.map((c) => [c, 1])) +
-    `${animate ? drift(rand, PERIOD * 0.9, 18) : ''}</linearGradient>`;
-  const sheen =
-    `<linearGradient id="habit-${name}-sheen" gradientUnits="userSpaceOnUse" ${toward(-40 - rand() * 30, SHEEN)} spreadMethod="reflect">` +
-    stops([[light, 0.4], [light, 0], [deep, 0.45], [deep, 0], [light, 0.25]]) +
-    `${animate ? drift(rand, SHEEN * 1.2, SHEEN * 0.6) : ''}</linearGradient>`;
-  return base + sheen;
+  // A transfer table that is 1 only at one level of a field (0–1), and 0 everywhere else.
+  const contour = (level, steps = 41) => Array.from({ length: steps }, (_, i) => +(Math.round(level * (steps - 1)) === i)).join(' ');
+  return (
+    `<filter id="habit-${name}-stone" x="0" y="0" width="1" height="1" color-interpolation-filters="sRGB">` +
+    `<feTurbulence type="fractalNoise" baseFrequency="0.035 0.06" numOctaves="5" seed="${seed}" stitchTiles="stitch" result="clouds"/>` +
+    `<feColorMatrix in="clouds" values="${paint(cloud, '3.2 0 0 0 -1.3')}" result="light"/>` +
+    `<feColorMatrix in="clouds" values="${paint(shadow, '0 3.2 0 0 -1.3')}" result="dark"/>` +
+    `<feTurbulence type="fractalNoise" baseFrequency="0.022 0.04" numOctaves="5" seed="${seed + 3}" stitchTiles="stitch" result="field"/>` +
+    `<feComponentTransfer in="field" result="contours">` +
+    `<feFuncR type="table" tableValues="${contour(0.5)}"/><feFuncG type="table" tableValues="${contour(0.44)}"/>` +
+    `<feFuncB type="table" tableValues="${contour(0.56)}"/><feFuncA type="table" tableValues="${contour(0.5)}"/></feComponentTransfer>` +
+    `<feColorMatrix in="contours" values="${paint(vein, '0.85 0.55 0.4 0.3 0')}" result="veins"/>` +
+    `<feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="${seed + 5}" stitchTiles="stitch" result="grain"/>` +
+    `<feColorMatrix in="grain" values="${paint(vein, '1.4 0 0 0 -0.72')}" result="flecks"/>` +
+    `<feColorMatrix in="grain" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.4 0 0 -0.72" result="pits"/>` +
+    `<feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="light"/><feMergeNode in="dark"/>` +
+    `<feMergeNode in="veins"/><feMergeNode in="flecks"/><feMergeNode in="pits"/></feMerge>` +
+    `</filter>` +
+    `<pattern id="habit-${name}" width="${SLAB_W}" height="${SLAB_H}" patternUnits="userSpaceOnUse">` +
+    `<rect width="${SLAB_W}" height="${SLAB_H}" fill="${stone}" filter="url(#habit-${name}-stone)"/></pattern>`
+  );
 }
 
 const escapeAttr = (s) => String(s).replace(/[&"<>]/g, (c) => `&#${c.charCodeAt(0)};`);
@@ -194,7 +183,6 @@ export function trackerFigure(data, today, { repo, branch, file }) {
 const TOKEN_KEY = 'habits-token';
 const store = { data: null, remote: null, token: null, ops: new Map(), timer: 0, saving: false, again: false, fresh: false, status: '' };
 let fig = null;
-let still = false;
 
 const readToken = () => {
   try {
@@ -211,7 +199,6 @@ const writeToken = (token) => {
 };
 
 export function initHabits() {
-  still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   store.token = readToken();
   mount();
   addEventListener('page:shown', mount);
@@ -262,7 +249,7 @@ function mount() {
 function draw(toEnd) {
   const scroller = fig.querySelector('.habits-scroll');
   const fromRight = scroller.scrollWidth - scroller.clientWidth - scroller.scrollLeft;
-  scroller.innerHTML = renderTracker(store.data, localToday(), { animate: !still });
+  scroller.innerHTML = renderTracker(store.data, localToday());
   scroller.scrollLeft = toEnd ? scroller.scrollWidth : scroller.scrollWidth - scroller.clientWidth - fromRight;
 }
 

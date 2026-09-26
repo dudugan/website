@@ -213,6 +213,24 @@ main strong {
   }
 }
 
+/* ---------- folded sections: hidden until their link is clicked (folds.js) ---------- */
+.js .fold {
+  display: none;
+}
+.js .fold.open {
+  display: block;
+  animation: unfold 0.35s ease;
+}
+@keyframes unfold {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+main a[aria-expanded='true'] {
+  text-decoration-color: currentColor;
+}
+
 /* ---------- writings: the list of posts, and each post's date ---------- */
 .posts {
   list-style: none;
@@ -488,6 +506,9 @@ footer {
   #sound.playing .bars i {
     animation: none;
     transform: scaleY(0.7);
+  }
+  .js .fold.open {
+    animation: none;
   }
   main strong {
     animation: none;

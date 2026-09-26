@@ -1,4 +1,5 @@
 import { initCollage } from './collage.js';
+import { initFolds } from './folds.js';
 import { initHabits } from './habits.js';
 import { runLoader } from './loader.js';
 import { initMusic } from './music.js';
@@ -10,4 +11,5 @@ initTorch();
 initMusic();
 initRouter();
 initCollage();
+initFolds();
 initHabits();

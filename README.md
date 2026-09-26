@@ -8,6 +8,7 @@ A minimalist personal site. Each page is one markdown file, and all pages share 
 | --- | --- |
 | a page's text | `content/<page>.md` (only content, no front matter) |
 | the habit tracker | `content/habits.json` (put `<!-- habits -->` on its own line in any page to show it; it's at the top of /now) |
+| a section that opens on click | link to a heading on the same page, like `[music](#music)` for `# music`; that heading's section stays hidden until the link is clicked |
 | a blog post | `content/writings/YYYY-MM-DD-slug.md`; its first `# heading` is the title, and it's listed at `/writings` |
 | name, description, nav order, the 5 external links | `site.config.json` |
 | layout / chrome | `src/layout.html` (the only HTML file) and `src/css/site.css` |
