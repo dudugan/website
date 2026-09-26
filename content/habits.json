@@ -1,55 +1,40 @@
 {
   "habits": [
     {
-      "name": "Eat AIS",
-      "color": "purple",
-      "max-gap": 1,
-      "done": [
-        "2026-09-02", "2026-09-03", "2026-09-04", "2026-09-05", "2026-09-06", "2026-09-07", "2026-09-14"
-      ]
+      "name": "Improvise on the piano",
+      "color": "blue",
+      "max-gap": 2,
+      "done": []
     },
     {
-      "name": "Exercise",
+      "name": "Do Tom Holland's favorite CrossFit workout",
       "color": "gold",
       "max-gap": 2,
-      "done": [
-        "2026-08-28", "2026-08-29", "2026-08-30",
-        "2026-09-04", "2026-09-07", "2026-09-10", "2026-09-14"
-      ]
+      "done": []
     },
     {
-      "name": "Flashcards",
+      "name": "Read the sequences",
       "color": "teal",
       "max-gap": 1,
-      "done": [
-        "2026-08-28", "2026-08-29", "2026-08-30",
-        "2026-09-04", "2026-09-07", "2026-09-09"
-      ]
+      "done": []
     },
     {
-      "name": "Improvise",
+      "name": "Think of projects",
       "color": "ember",
-      "max-gap": 1,
-      "done": [
-        "2026-09-05", "2026-09-06", "2026-09-09", "2026-09-11", "2026-09-12", "2026-09-13", "2026-09-14", "2026-09-15"
-      ]
+      "max-gap": 2,
+      "done": []
     },
     {
-      "name": "Responding",
-      "color": "blue",
-      "max-gap": 1,
-      "done": [
-        "2026-08-28", "2026-08-29", "2026-08-30", "2026-08-31",
-        "2026-09-01", "2026-09-02", "2026-09-04", "2026-09-05", "2026-09-06", "2026-09-08", "2026-09-10", "2026-09-12", "2026-09-14"
-      ]
-    },
+      "name": "Respond to messages",
+      "color": "purple",
+      "max-gap": 2,
+      "done": []
+    }, 
     {
-      "name": "Sequences",
+      "name": "Write a musing",
       "color": "green",
-      "max-gap": 1,
-      "done": [
-        "2026-09-01", "2026-09-02", "2026-09-07"
-      ]
+      "max-gap": 2,
+      "done": []
     }
   ]
 }
