@@ -6,6 +6,15 @@ Working assumptions that haven't been approved yet stay in [PLAN.md](PLAN.md) un
 
 ---
 
+## 2026-09-26: longer loader, linked influences
+
+### Decided by you
+- **The loader lasts 2 s longer.** It now stays up for at least 4.3 s (was 2.3 s) and at most 8 s (was 6 s).
+- **Everything named on `/influences` gets an external link**, opening in a new tab.
+  - Films, shows, books, and music link to Wikipedia, or to an official site where one exists (Unsong, The Sequences).
+  - Professors link to their Yale faculty pages.
+  - Friends and collaborators are only linked where their own page could be confidently identified. The rest are still pending.
+
 ## 2026-09-25: first build
 
 ### Decided by you

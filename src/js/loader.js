@@ -2,8 +2,8 @@
 // the wave can travel down the line), then fades into the site. First page of a visit only:
 // the inline script in <head> decides that before first paint by adding .loading.
 
-const MIN_MS = 2300;
-const MAX_MS = 6000;
+const MIN_MS = 4300;
+const MAX_MS = 8000;
 
 export function runLoader() {
   const root = document.documentElement;

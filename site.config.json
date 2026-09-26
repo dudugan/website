@@ -1,12 +1,12 @@
 {
   "name": "David Garsten",
-  "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+  "description": "A biolinguistics student working on AI safety.",
   "nav": ["now", "past-lives", "influences"],
   "links": [
-    { "label": "old site", "url": "https://example.com/old-site" },
-    { "label": "linkedin", "url": "https://example.com/linkedin" },
-    { "label": "newsletter", "url": "https://example.com/newsletter" },
-    { "label": "ai safety", "url": "https://example.com/ai-safety-substack" },
-    { "label": "resume", "url": "https://example.com/resume.pdf" }
+    { "label": "overworld", "url": "https://dudugan.github.io" },
+    { "label": "linkedin", "url": "https://www.linkedin.com/in/david-garsten-310815286/" },
+    { "label": "newsletter", "url": "https://dudugan.substack.com" },
+    { "label": "substack", "url": "https://friedgrice.substack.com" },
+    { "label": "resume", "url": "https://dudugan.github.io/media/documents/resume.pdf" }
   ]
 }
