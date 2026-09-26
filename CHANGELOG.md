@@ -6,6 +6,20 @@ Working assumptions that haven't been approved yet stay in [PLAN.md](PLAN.md) un
 
 ---
 
+## 2026-09-26: paler, liquid tracker
+
+### Decided by you
+- **The tracker's colours are paler and faded.** Each colour is now six pastel shades instead of four dark ones. The names are unchanged: teal, purple, ember, green, gold, blue.
+- **The colour moves like liquid** instead of sliding left and back.
+  - Each colour has two layers: the six shades, and a diagonal sheen of light and dark bands.
+  - Each layer wanders through random offsets on an uneven clock.
+- **Half as many days show at once** (14, two weeks), and the tracker is centred under the text.
+
+### Proposed by Claude while building (tell me if you want any of these changed)
+- **Every animation loop is still under 7 s**, per the site's animation rule. The two layers of each colour loop at different lengths, so together they rarely repeat.
+- **A long habit name wraps under the tracker without moving anything else.** The date stays on one line.
+- **The dev server now picks up edits to the tracker code** without a restart.
+
 ## 2026-09-26: tracker moves to the homepage
 
 ### Decided by you

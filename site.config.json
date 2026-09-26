@@ -8,6 +8,7 @@
     { "label": "linkedin", "url": "https://www.linkedin.com/in/david-garsten-310815286/" },
     { "label": "newsletter", "url": "https://dudugan.substack.com" },
     { "label": "substack", "url": "https://friedgrice.substack.com" },
-    { "label": "resume", "url": "https://dudugan.github.io/media/documents/resume.pdf" }
+    { "label": "resume", "url": "https://dudugan.github.io/media/documents/resume.pdf" },
+    { "label": "email", "url": "mailto:duzugan@gmail.com" }
   ]
 }

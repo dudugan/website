@@ -8,20 +8,24 @@
 // this repo's contents. The squares become clickable, and clicks are committed to
 // content/habits.json through the GitHub API, which redeploys the site.
 
+// Faded colours: six shades each for the flowing base, plus a light and a deep tone for the
+// sheen that drifts across it.
 export const PALETTES = {
-  teal: ['#178f86', '#0e6b67', '#5cc9bd', '#1f9e93'],
-  purple: ['#7440a6', '#4b2170', '#a878d6', '#61308f'],
-  ember: ['#c4461a', '#86260c', '#f0874a', '#a8380f'],
-  green: ['#2f8a3a', '#1c5e25', '#6cc070', '#27752f'],
-  gold: ['#b88a1b', '#7d5c0c', '#e3b955', '#a0760f'],
-  blue: ['#2f5fae', '#1c3c78', '#6d98e0', '#28529a'],
+  teal: { shades: ['#9acbc4', '#74beae', '#bad8d7', '#87c4b4', '#64b9b4', '#afcfd0'], light: '#e0ebe9', deep: '#45877e' },
+  purple: { shades: ['#b49dc8', '#9678ba', '#cdbdd6', '#a08bc1', '#9669b5', '#c5b1cd'], light: '#e6e1ea', deep: '#684983' },
+  ember: { shades: ['#daa08b', '#d27560', '#e3c3b0', '#d68276', '#d0794e', '#ddbba2'], light: '#f0e1db', deep: '#9b4d31' },
+  green: { shades: ['#9fc6a4', '#7ab87d', '#bed5c3', '#8dbf8d', '#6bb379', '#b3ccba'], light: '#e2e9e3', deep: '#4b8153' },
+  gold: { shades: ['#d7c18e', '#cea564', '#e1d8b2', '#d2ac79', '#cbaf52', '#dad3a4'], light: '#efe9dc', deep: '#977a35' },
+  blue: { shades: ['#95add0', '#6e98c4', '#b7c2dc', '#82a8c9', '#5d7ec0', '#abb4d4'], light: '#dfe4ec', deep: '#3f5e8d' },
 };
 
 const S = 16; // square
 const GAP = 4;
 const STEP = S + GAP;
 const R = 4; // corner radius
-const PERIOD = 240; // width of one sweep of a colour gradient
+const VISIBLE = 14; // days in view at once; scroll for the rest
+const PERIOD = 160; // width of one sweep through a colour's shades
+const SHEEN = 64; // width of one band of the sheen
 const DAY = 86400000;
 
 export const dayOf = (iso) => {
@@ -109,44 +113,88 @@ export function renderTracker({ habits }, today, { animate = true } = {}) {
   const body = [`<rect width="${w}" height="${h}" fill="url(#habit-off)"/>`];
   habits.forEach((habit, r) => {
     const y = r * STEP;
-    const fill = `url(#habit-${habit.color})`;
+    const base = `url(#habit-${habit.color})`;
+    const paint = (shape) => shape.replace('/>', ` fill="${base}"/>`) + shape.replace('/>', ` fill="url(#habit-${habit.color}-sheen)"/>`);
     used.add(habit.color);
     for (const s of streaksOf(days[r], habit.maxGap, today)) {
       if (s.to === s.start) {
-        body.push(`<rect x="${x(s.start)}" y="${y}" width="${S}" height="${S}" rx="${R}" fill="${fill}"/>`);
+        body.push(paint(`<rect x="${x(s.start)}" y="${y}" width="${S}" height="${S}" rx="${R}"/>`));
         continue;
       }
       const span = (a, b, rl, rr) => bar(x(a), y, x(b) + S - x(a), S, rl, rr);
       // Blank out the empty squares underneath, then the tinted bar, then the days done.
       body.push(`<path d="${span(s.start, s.to, R, R)}" fill="#000"/>`);
-      body.push(`<path d="${span(s.start, s.to, R, R)}" fill="${fill}" fill-opacity="0.42"/>`);
-      for (const [a, b] of s.runs) {
-        body.push(`<path d="${span(a, b, a === s.start ? R : 0, b === s.to ? R : 0)}" fill="${fill}"/>`);
-      }
+      body.push(`<path d="${span(s.start, s.to, R, R)}" fill="${base}" fill-opacity="0.3"/>`);
+      for (const [a, b] of s.runs) body.push(paint(`<path d="${span(a, b, a === s.start ? R : 0, b === s.to ? R : 0)}"/>`));
     }
   });
 
-  const sweep = animate
-    ? `<animateTransform attributeName="gradientTransform" type="translate" values="0 0;${PERIOD} 0;0 0" keyTimes="0;0.5;1" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" dur="6s" repeatCount="indefinite"/>`
-    : '';
-  const gradients = [...used].map(
-    (name) =>
-      `<linearGradient id="habit-${name}" gradientUnits="userSpaceOnUse" x2="${PERIOD}" spreadMethod="reflect">` +
-      PALETTES[name].map((c, i, all) => `<stop offset="${i / (all.length - 1)}" stop-color="${c}"/>`).join('') +
-      `${sweep}</linearGradient>`,
-  );
   const off = `<pattern id="habit-off" width="${STEP}" height="${STEP}" patternUnits="userSpaceOnUse"><rect width="${S}" height="${S}" rx="${R}" fill="#171717"/></pattern>`;
   return (
     `<svg class="habits-grid" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" data-start="${start}" data-days="${n}" aria-hidden="true">` +
-    `<defs>${off}${gradients.join('')}</defs>${body.join('')}</svg>`
+    `<defs>${off}${[...used].map((name) => gradients(name, animate)).join('')}</defs>${body.join('')}</svg>`
   );
+}
+
+// Stable randomness per colour, so each row keeps its own currents from build to build.
+function seeded(str) {
+  let seed = 2166136261;
+  for (const ch of str) seed = Math.imul(seed ^ ch.charCodeAt(0), 16777619);
+  return () => {
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// Wanders through a few random offsets on an uneven clock and comes back. Each loop is under
+// 7 s, like every animation on the site, but the base and the sheen run on different loop
+// lengths, so together they rarely repeat and the colour moves like liquid.
+function drift(rand, spanX, spanY) {
+  const legs = 4 + Math.floor(rand() * 3);
+  const lengths = Array.from({ length: legs }, () => 0.5 + rand());
+  const total = lengths.reduce((a, b) => a + b);
+  const values = ['0 0'];
+  const times = ['0'];
+  let t = 0;
+  for (let i = 1; i < legs; i++) {
+    t += lengths[i - 1] / total;
+    values.push(`${((rand() * 2 - 1) * spanX).toFixed(1)} ${((rand() * 2 - 1) * spanY).toFixed(1)}`);
+    times.push(t.toFixed(3));
+  }
+  values.push('0 0');
+  times.push('1');
+  const dur = (4.6 + rand() * 2.3).toFixed(2);
+  const ease = Array(legs).fill('0.4 0.1 0.6 0.9').join(';');
+  return `<animateTransform attributeName="gradientTransform" type="translate" values="${values.join(';')}" keyTimes="${times.join(';')}" calcMode="spline" keySplines="${ease}" dur="${dur}s" repeatCount="indefinite"/>`;
+}
+
+function gradients(name, animate) {
+  const { shades, light, deep } = PALETTES[name];
+  const rand = seeded(name);
+  const toward = (deg, len) => {
+    const a = (deg * Math.PI) / 180;
+    return `x2="${(Math.cos(a) * len).toFixed(1)}" y2="${(Math.sin(a) * len).toFixed(1)}"`;
+  };
+  const stops = (list) =>
+    list.map(([c, o], i) => `<stop offset="${(i / (list.length - 1)).toFixed(3)}" stop-color="${c}"${o < 1 ? ` stop-opacity="${o}"` : ''}/>`).join('');
+  const base =
+    `<linearGradient id="habit-${name}" gradientUnits="userSpaceOnUse" ${toward(8 + rand() * 20, PERIOD)} spreadMethod="reflect">` +
+    stops(shades.map((c) => [c, 1])) +
+    `${animate ? drift(rand, PERIOD * 0.9, 18) : ''}</linearGradient>`;
+  const sheen =
+    `<linearGradient id="habit-${name}-sheen" gradientUnits="userSpaceOnUse" ${toward(-40 - rand() * 30, SHEEN)} spreadMethod="reflect">` +
+    stops([[light, 0.55], [light, 0], [deep, 0.3], [deep, 0], [light, 0.35]]) +
+    `${animate ? drift(rand, SHEEN * 1.2, SHEEN * 0.6) : ''}</linearGradient>`;
+  return base + sheen;
 }
 
 const escapeAttr = (s) => String(s).replace(/[&"<>]/g, (c) => `&#${c.charCodeAt(0)};`);
 
 export function trackerFigure(data, today, { repo, branch, file }) {
   const json = JSON.stringify(data).replace(/</g, '\\u003c');
-  return `<figure class="habits" data-repo="${escapeAttr(repo)}" data-branch="${escapeAttr(branch)}" data-file="${escapeAttr(file)}">
+  return `<figure class="habits" style="max-width: ${VISIBLE * STEP - GAP}px" data-repo="${escapeAttr(repo)}" data-branch="${escapeAttr(branch)}" data-file="${escapeAttr(file)}">
 <div class="habits-scroll" tabindex="0" aria-label="habit tracker">${renderTracker(data, today)}</div>
 <figcaption class="habits-info"><span></span><span></span></figcaption>
 <script type="application/json" class="habits-data">${json}</script>

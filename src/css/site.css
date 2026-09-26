@@ -239,7 +239,7 @@ main strong {
 
 /* ---------- habit tracker (habits.js) ---------- */
 .habits {
-  margin: 1.8rem 0 1rem;
+  margin: 1.8rem auto 1rem; /* narrower than the column (see VISIBLE in habits.js), centred */
 }
 .habits-scroll {
   display: flex;
@@ -268,12 +268,22 @@ main strong {
 .habits-info {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
   gap: 1rem;
-  min-height: 1.35em;
+  height: 1.35em; /* a long name's second line hangs into the space below instead of pushing it */
   margin-top: 0.4rem;
   font-size: 0.78rem;
   font-style: italic;
+  line-height: 1.35;
   color: var(--muted);
+}
+.habits.editing .habits-info {
+  height: auto;
+  min-height: 1.35em;
+}
+.habits-info span:last-child {
+  flex: none;
+  white-space: nowrap;
 }
 .habits-edit,
 .habits-login {

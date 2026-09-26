@@ -1,11 +1,16 @@
-## lorem ipsum
+I think of myself as a scientist and artist at heart. In past lives, most of what I did fell into these two categories. 
 
-Dolor sit amet, consectetur adipiscing elit. Nam nec ante sed lacinia urna non tincidunt mattis, tortor neque adipiscing diam.
+See below my research, music, writing, and web design. 
 
-## dolor sit amet
+# research
 
-Aenean quam in scelerisque sem at dolor maecenas mattis. Sed convallis tristique sem, proin ut ligula vel nunc egestas porttitor.
+- publication
+- publication
 
-## consectetur
+See more on [my older website]. 
 
-Morbi lectus risus, iaculis vel suscipit quis, luctus non massa. Fusce ac turpis quis ligula lacinia aliquet.
+# music
+
+# writing
+
+# web design

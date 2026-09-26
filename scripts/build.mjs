@@ -21,7 +21,6 @@ import { dirname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { Marked } from 'marked';
 import { IMAGE_DIR, imageSlug } from './images.mjs';
-import { localToday, parseHabits, trackerFigure } from '../src/js/habits.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const at = (...p) => join(root, ...p);
@@ -97,6 +96,8 @@ export async function build({ base = process.env.BASE_PATH ?? '', quiet = false 
   const config = JSON.parse(await readFile(at('site.config.json'), 'utf8'));
   const layout = await readFile(at('src/layout.html'), 'utf8');
   const { default: procession } = await import(pathToFileURL(at('src/art/procession.mjs')).href + `?t=${Date.now()}`);
+  // Fresh imports each build, so the dev server picks up edits to these without a restart.
+  const { localToday, parseHabits, trackerFigure } = await import(pathToFileURL(at('src/js/habits.js')).href + `?t=${Date.now()}`);
   // Links whose image `npm run images` has fetched get data-img, which the collage picks up.
   const linkImages = new Set(await readdir(IMAGE_DIR).catch(() => []));
   const marked = markdownRenderer(base, linkImages);

@@ -104,7 +104,8 @@ website/
 ### Phase 9d: Habit tracker
 28e. `[x]` The tracker sits at the bottom of the homepage. `content/habits.json` holds the habits: name, colour, max-gap, and the days done. One renderer (`src/js/habits.js`) draws it at build time and again in the browser, so the rightmost column is always today.
    - Each day is a small rounded square. A streak joins its squares into one bar, with missed days tinted.
-   - Each colour has a slow gradient shimmer.
+   - Colours are faded pastels that flow like liquid: two drifting gradient layers per colour, each looping in under 7 s.
+   - It's centred and shows 14 days at a time.
    - Hovering shows the habit's name (left) and the date (right).
    - You can scroll or drag sideways through the dates.
 28f. `[x]` Edit mode (option B1): `?edit` plus a GitHub token lets you click squares. Clicks are committed to the file via the GitHub API, merged with any newer version of the file. It's tested against a fake GitHub (login, merge, conflict retry, bad token, log out) but hasn't yet been tried with a real token.
