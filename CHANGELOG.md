@@ -6,6 +6,29 @@ Working assumptions that haven't been approved yet stay in [PLAN.md](PLAN.md) un
 
 ---
 
+## 2026-09-26: habit clicks leave the music alone
+
+### Decided by you
+- **Clicking the habit tracker never starts or pauses the music**, including the very first click on a page.
+
+### Proposed by Claude while building (tell me if you want any of these changed)
+- **Fixed the underlying bug.** Marking a day redraws the tracker, which detached the clicked square before the music checked where the click was, so it looked like a click on empty space. The music now checks the click's path as it was when it happened.
+- **Logging out of edit mode cancels a save that's still waiting**, so it can't run afterwards without a token.
+
+## 2026-09-26: flame favicon
+
+### Decided by you
+- **The favicon is just the fire, drawn as a black ink outline.** It started as a full-colour Olympic-style torch. A smoother one-colour flame came in between, but that was too much like the stock icon.
+
+### Proposed by Claude while building (tell me if you want any of these changed)
+- **The drawing:**
+  - A twisting centre tongue with a lick on either side.
+  - One open stroke inside, and a wisp breaking off the top.
+  - A slight displacement gives the line a pen's unsteadiness.
+- **The line is 3.8 units thick**, enough to hold up at 16 px.
+- **Home-screen icons put the flame on a bone-white tile**, since black on the old black tile would vanish.
+- **On dark tab bars the favicon switches to white** (you asked, after seeing the all-black version there). The .ico fallback and the home-screen icons stay black.
+
 ## 2026-09-26: species names on the loader, flat tracker squares
 
 ### Decided by you

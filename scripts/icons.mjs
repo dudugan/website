@@ -10,6 +10,7 @@ import { Resvg } from '@resvg/resvg-js';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const svg = await readFile(join(root, 'src/art/favicon.svg'), 'utf8');
 const config = JSON.parse(await readFile(join(root, 'site.config.json'), 'utf8'));
+const viewBox = svg.match(/viewBox="([^"]+)"/)[1];
 
 // Rasterise at `size`; `padding` shrinks the drawing inside a solid background (home-screen icons).
 function png(size, { background, padding = 0 } = {}) {
@@ -18,7 +19,7 @@ function png(size, { background, padding = 0 } = {}) {
   const framed = background
     ? `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
          <rect width="${size}" height="${size}" fill="${background}"/>
-         <svg x="${offset}" y="${offset}" width="${inner}" height="${inner}" viewBox="0 0 64 64">${svg.replace(/<\/?svg[^>]*>/g, '').replace('#17120e', '#ece7dc')}</svg>
+         <svg x="${offset}" y="${offset}" width="${inner}" height="${inner}" viewBox="${viewBox}">${svg.replace(/<\/?svg[^>]*>/g, '')}</svg>
        </svg>`
     : svg;
   return new Resvg(framed, { fitTo: { mode: 'width', value: size } }).render().asPng();
@@ -47,9 +48,10 @@ function ico(images) {
 const out = (name) => join(root, 'public', name);
 await writeFile(out('favicon.svg'), svg);
 await writeFile(out('favicon.ico'), ico([16, 32].map((size) => ({ size, data: png(size) }))));
-await writeFile(out('apple-touch-icon.png'), png(180, { background: '#000', padding: 0.12 }));
-await writeFile(out('icon-192.png'), png(192, { background: '#000', padding: 0.12 }));
-await writeFile(out('icon-512.png'), png(512, { background: '#000', padding: 0.12 }));
+// Home-screen icons: the black ink flame on a bone-white tile.
+await writeFile(out('apple-touch-icon.png'), png(180, { background: '#ece7dc', padding: 0.12 }));
+await writeFile(out('icon-192.png'), png(192, { background: '#ece7dc', padding: 0.12 }));
+await writeFile(out('icon-512.png'), png(512, { background: '#ece7dc', padding: 0.12 }));
 await writeFile(
   out('site.webmanifest'),
   JSON.stringify(

@@ -6,7 +6,7 @@
 // The placeholder soundtrack is generated live with Web Audio: fire crackle, a low drone,
 // and a sparse music box wandering an A-minor pentatonic scale. There are no audio files.
 
-const INTERACTIVE = 'a, button, input, textarea, select, label, summary, [role="button"], [contenteditable], .habits';
+const INTERACTIVE = 'a, button, input, textarea, select, label, summary, [role="button"], [contenteditable]';
 
 export function initMusic() {
   const button = document.getElementById('sound');
@@ -40,9 +40,12 @@ export function initMusic() {
 
   button.addEventListener('click', toggle);
   document.addEventListener('click', (e) => {
-    if (e.target.closest('#sound')) return;
-    if (!engine) return play(); // the very first click, wherever it lands
-    if (e.target.closest(INTERACTIVE)) return;
+    // Checked against the path at dispatch, not e.target.closest(): a click handler (the habit
+    // tracker's) can re-render what was clicked, detaching it before the click gets here.
+    const within = (selector) => e.composedPath().some((el) => el instanceof Element && el.matches(selector));
+    if (within('#sound, .habits')) return; // marking habits never starts or pauses the music
+    if (!engine) return play(); // the very first click, wherever else it lands
+    if (within(INTERACTIVE)) return;
     if (String(getSelection()).trim()) return; // finishing a text selection isn't a toggle
     toggle();
   });

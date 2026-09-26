@@ -69,8 +69,8 @@ website/
 13. `[–]` The separate style test sheet was skipped, because you said "go" and there's no background to design. The loader drawing itself serves as the style checkpoint (step 23).
 
 ### Phase 5: Favicon
-14. `[x]` An inked torch flame, legible at 16 px on both light and dark tab bars.
-15. `[x]` `favicon.svg` (switches to a light outline in dark mode), `favicon.ico` (16 + 32), `apple-touch-icon.png`, 192/512 icons, and `site.webmanifest`.
+14. `[x]` Just the fire, as a hand-drawn ink outline: black, or white on dark tab bars. A twisting centre tongue with a lick either side, an open inner stroke, and a wisp. It started as a full-colour torch.
+15. `[x]` `favicon.svg`, `favicon.ico` (16 + 32), `apple-touch-icon.png` and the 192/512 icons (black flame on a bone tile), and `site.webmanifest`.
 
 ### Phase 6: Background
 16–19. `[–]` Shelved on 2026-09-25: no background for now, and Claude won't draw it. See the deferred section below.

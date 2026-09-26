@@ -305,6 +305,7 @@ async function refresh() {
 }
 
 async function save() {
+  if (!store.token) return; // logged out since the click
   if (store.saving) return void (store.again = true);
   store.saving = true;
   status('saving…');
@@ -370,6 +371,7 @@ function editing() {
   line.querySelector('button').addEventListener('click', () => {
     if (store.ops.size && !confirm('Some clicks are not saved yet. Log out anyway?')) return;
     writeToken(null);
+    clearTimeout(store.timer);
     Object.assign(store, { token: null, ops: new Map(), fresh: false, status: '' });
     fig.classList.remove('editing');
     line.remove();
