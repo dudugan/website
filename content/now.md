@@ -1,16 +1,10 @@
-*26/9/2026. This website is built.*
-
-The basics:
-
-- a SPAR research fellow working with Morgan Sinclaire on collusion in untrusted monitoring
-- budgeting my time between writing AI safety blog posts, doing ARENA, consuming knowledge, applying to things, etc. - would love advice or feedback about this
-- writing my senior thesis for school with Bob Frank on making tier-based strictly-local models of Agree more derivational
-- taking a relatively light courseload: Research Methods, Independent Study, Kiswahili, Human Evolution, and Neurosymbolic & Bayesian Models
-
-The side quests:
-
-- doing Danceworks with friends
-- a friend got me into Zulu jazz
-- soon learning the Lord of the Rings card game
+*26/9/2026.*
+- I'm a current SPAR research fellow working with Morgan Sinclaire on collusion in untrusted monitoring
+- I'm a senior at Yale (actually, a '27.5) writing my thesis with Bob Frank on making tier-based strictly-local models of Agree more derivational
+- I'm also taking Kiswahili, Human Evolution, and Neurosymbolic & Bayesian Models
+- I'm trying to budget my time between writing AI safety blog posts, doing ARENA, consuming AI safety knowledge, doing projects, and applying to things - would love advice or feedback about this
+- I'm doing Danceworks with AR, DW, NS, MG, and KW (we're dancing to *Luther*)
+- I've been listening to a lot of South African (Zulu) jazz recently thanks to TS for the rec
+- I'm gonna learn the Lord of the Rings card game soon with AL
 
 I'll be in SF early this January (officially to give a talk at the Linguistics Society of America meeting). Until then I'll be in New Haven, supplemented by some New York and maybe Princeton trips. Let me know if you want to meet up!
