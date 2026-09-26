@@ -1,3 +1,5 @@
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+In the overworld I study morphosyntax, human evolution, animal communication, and alien linguistics. Here in the nether, I work on AI safety, because I'm worried about the future of humanity. I'm still figuring out how I can best help out, and would love to hear from you if you have advice or just want to talk!
 
-Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in [reprehenderit](/now) in voluptate velit esse cillum dolore.
+<!-- In the overworld I'm a biolinguist and a senior at Yale -->
+<!-- I draw a lot of trees and automata.  -->
+<!-- [reprehenderit](/now) -->
