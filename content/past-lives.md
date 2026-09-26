@@ -1,5 +1,3 @@
-# past lives
-
 ## lorem ipsum
 
 Dolor sit amet, consectetur adipiscing elit. Nam nec ante sed lacinia urna non tincidunt mattis, tortor neque adipiscing diam.

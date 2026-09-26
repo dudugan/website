@@ -1,5 +1,3 @@
-# influences
-
 I'm someone who gets really inspired and moved by things. Usually these things are pieces of media, or other people. *Beautiful* is a heavy-lifting adjective for me. 
 
 Some **movies** that have shaped me are [Whale Rider](https://en.wikipedia.org/wiki/Whale_Rider), [Princess Mononoke](https://en.wikipedia.org/wiki/Princess_Mononoke), [Ajami](https://en.wikipedia.org/wiki/Ajami_(film)), and [Avatar](https://en.wikipedia.org/wiki/Avatar_(2009_film)). I'm also a huge [Avatar: the Last Airbender](https://en.wikipedia.org/wiki/Avatar:_The_Last_Airbender) fan. I've been less shaped by, but still moved by, [Across the Spiderverse](https://en.wikipedia.org/wiki/Spider-Man:_Across_the_Spider-Verse), [Brand New Day](https://en.wikipedia.org/wiki/Spider-Man:_Brand_New_Day), [Battlestar Galactica](https://en.wikipedia.org/wiki/Battlestar_Galactica_(2004_TV_series)), and [Arcane](https://en.wikipedia.org/wiki/Arcane_(TV_series)). I deeply love the short film [Two Cars, One Night](https://en.wikipedia.org/wiki/Two_Cars,_One_Night). 

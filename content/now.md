@@ -1,5 +1,3 @@
-# now
-
 *26/9/2026. This website is built.*
 
 The basics:
