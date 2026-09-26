@@ -10,4 +10,4 @@ Note that although the metaphor on the homepage is from Minecraft, I actually on
 
 Also note that [my older website](https://dudugan.github.io) is still almost all hand-coded. It feels like hand-coding has now become an art form, and practicing it is sort of meditative. 
 
-Finally, note that I really need to get back into the practice of daily writing, so posts like flow better and are not just lists of notes. 
+Finally, note that I really need to get back into the practice of daily writing, so posts like this flow better and are not just lists of notes. 
