@@ -6,6 +6,12 @@ Working assumptions that haven't been approved yet stay in [PLAN.md](PLAN.md) un
 
 ---
 
+## 2026-09-26: bold text gets a fire gradient
+
+### Decided by you
+- **Bold text (`**...**`) is no longer plain foreground white.** It now renders in a warm gradient — gold through amber to ember-orange, the same palette as the torch glow — with a very slow, subtle shift (6 s loop). You asked for a color or animated gradient and left the choice to Claude; the torch's existing fire palette was picked so it stays consistent with "the fire is the only colour."
+- Reduced-motion visitors get the gradient frozen in place, no shift.
+
 ## 2026-09-26: longer loader, linked influences
 
 ### Decided by you
