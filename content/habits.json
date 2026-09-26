@@ -20,13 +20,17 @@
       "name": "Read the sequences",
       "color": "teal",
       "max-gap": 1,
-      "done": []
+      "done": [
+        "2026-09-24"
+      ]
     },
     {
       "name": "Think of projects",
       "color": "ember",
       "max-gap": 2,
-      "done": []
+      "done": [
+        "2026-09-25"
+      ]
     },
     {
       "name": "Respond to messages",
@@ -41,7 +45,9 @@
       "name": "Write a musing",
       "color": "green",
       "max-gap": 2,
-      "done": []
+      "done": [
+        "2026-09-26"
+      ]
     }
   ]
 }
