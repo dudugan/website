@@ -33,7 +33,9 @@
       "name": "Think of projects",
       "color": "ember",
       "max-gap": 2,
-      "done": []
+      "done": [
+        "2026-10-04"
+      ]
     },
     {
       "name": "Respond to messages",
