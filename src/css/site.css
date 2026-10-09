@@ -191,6 +191,12 @@ main img {
 }
 main code {
   font-size: 0.85em;
+  color: #ff934a; /* fire, like the torch */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+main pre {
+  white-space: pre-wrap;
 }
 main strong {
   font-weight: 600;
@@ -226,6 +232,21 @@ main strong {
     opacity: 0;
     transform: translateY(-4px);
   }
+}
+.js .fold.collapsible {
+  display: block;
+}
+.js .fold.collapsible:not(.open) > :not(:first-child) {
+  display: none;
+}
+.js .fold.collapsible.open > :not(:first-child) {
+  animation: unfold 0.35s ease;
+}
+.fold.collapsible > :first-child {
+  cursor: pointer;
+}
+.fold.collapsible:not(.open) > :first-child {
+  color: var(--muted);
 }
 main a[aria-expanded='true'] {
   text-decoration-color: currentColor;
@@ -524,7 +545,8 @@ footer {
     animation: none;
     transform: scaleY(0.7);
   }
-  .js .fold.open {
+  .js .fold.open,
+  .js .fold.collapsible.open > :not(:first-child) {
     animation: none;
   }
   main strong {

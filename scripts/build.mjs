@@ -72,9 +72,14 @@ const headingId = (text) =>
 // A heading the page itself links to (#its-id) starts folded away, with everything under it
 // up to the next heading of its rank or higher; its link unfolds it (src/js/folds.js).
 // Without JS nothing is hidden, and the links just jump.
+// A page with a `<!-- collapsible -->` line instead folds every top-level heading's section
+// under its heading, which opens and closes it on click; the first starts open.
 function renderWithFolds(marked, md) {
   const tokens = marked.lexer(md);
+  const collapsible = md.includes('<!-- collapsible -->');
   const targets = new Set([...md.matchAll(/\]\(#([^)\s]+)\)/g)].map((m) => m[1]));
+  if (collapsible) for (const t of tokens) if (t.type === 'heading' && t.depth === 1) targets.add(headingId(t.text));
+  let opened = false;
   const html = [];
   let run = [];
   let fold = null;
@@ -84,7 +89,11 @@ function renderWithFolds(marked, md) {
     run = [];
   };
   const close = () => {
-    if (fold) html.push(`<section class="fold">\n${render(fold.tokens)}</section>\n`);
+    if (fold) {
+      const cls = collapsible ? ` collapsible${opened ? '' : ' open'}` : '';
+      opened = true;
+      html.push(`<section class="fold${cls}">\n${render(fold.tokens)}</section>\n`);
+    }
     fold = null;
   };
   for (const t of tokens) {

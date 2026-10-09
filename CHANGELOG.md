@@ -6,6 +6,17 @@ Working assumptions that haven't been approved yet stay in [PLAN.md](PLAN.md) un
 
 ---
 
+## 2026-10-03: collapsible sections on /now, fire-coloured code
+
+### Decided by you
+- **On /now, each top-level heading opens and closes its section when clicked.** The first section starts open and the others closed, and only one is open at a time.
+- **Code is fire-orange (#ff934a), and long code wraps** onto new lines instead of running off the page.
+
+### Proposed by Claude while building (tell me if you want any of these changed)
+- **Any page can do this** with a `<!-- collapsible -->` line.
+- **Closed headings show in grey.** They also work from the keyboard (Enter or Space).
+- **Without JS, every section shows.**
+
 ## 2026-09-26: the loader can't be skipped; tap names on phones
 
 ### Decided by you
