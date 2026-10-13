@@ -10,4 +10,4 @@
 
 **Last updated:** 10/8/26. 
 
-**Locations I'll be at in the next 3 months:** New Haven, New York, Princeton, SF. 
+**Locations I'll be at in the next 3 months:** New Haven, NYC, Princeton, SF. 
