@@ -5,11 +5,11 @@
 //   content/now.md         -> dist/now.html          served at /now
 //   content/past-lives.md  -> dist/past-lives.html   served at /past-lives
 //
-// Posts live in content/writings/, named YYYY-MM-DD-slug.md. Each one's first `# heading` is
-// its title. /writings lists them newest first:
+// Posts live in content/musings/, named YYYY-MM-DD-slug.md. Each one's first `# heading` is
+// its title. /musings lists them newest first:
 //
-//   content/writings/2026-09-26-hello-world.md -> dist/writings/hello-world.html  at /writings/hello-world
-//   (the list)                                 -> dist/writings/index.html        at /writings
+//   content/musings/2026-09-26-hello-world.md -> dist/musings/hello-world.html  at /musings/hello-world
+//   (the list)                                 -> dist/musings/index.html        at /musings
 //
 // A line `<!-- habits -->` in any page becomes the habit tracker, drawn from content/habits.json.
 //
@@ -31,12 +31,12 @@ const escapeHtml = (s) =>
 const labelFor = (slug) => slug.replace(/-/g, ' ');
 
 async function readPosts(marked) {
-  const dir = at('content/writings');
+  const dir = at('content/musings');
   const files = (await readdir(dir).catch(() => [])).filter((f) => f.endsWith('.md'));
   const posts = [];
   for (const file of files) {
     const match = file.match(/^(\d{4})-(\d{2})-(\d{2})-(.+)\.md$/);
-    if (!match) throw new Error(`content/writings/${file}: name posts YYYY-MM-DD-slug.md`);
+    if (!match) throw new Error(`content/musings/${file}: name posts YYYY-MM-DD-slug.md`);
     const [, y, m, d, slug] = match;
     const md = await readFile(join(dir, file), 'utf8');
     const heading = marked.lexer(md).find((t) => t.type === 'heading' && t.depth === 1);
@@ -182,7 +182,7 @@ export async function build({ base = process.env.BASE_PATH ?? '', quiet = false 
   const navHtml = (slug) =>
     config.nav
       .map((s) => {
-        // A post marks its section (writings) as current too.
+        // A post marks its section (musings) as current too.
         const current = s === slug ? ' aria-current="page"' : slug.startsWith(`${s}/`) ? ' aria-current="true"' : '';
         return `<a href="${base}/${s}"${current}>${escapeHtml(labelFor(s))}</a>`;
       })
@@ -232,20 +232,20 @@ export async function build({ base = process.env.BASE_PATH ?? '', quiet = false 
 
   const posts = await readPosts(marked);
   if (posts.length) {
-    await mkdir(at('dist/writings'), { recursive: true });
+    await mkdir(at('dist/musings'), { recursive: true });
     for (const post of posts) {
       const date = `<p class="post-date"><time datetime="${post.iso}">${post.shown}</time></p>`;
-      const body = parse(post.md, `content/writings/${post.slug}`);
+      const body = parse(post.md, `content/musings/${post.slug}`);
       const content = body.includes('</h1>') ? body.replace('</h1>', `</h1>\n${date}`) : date + body;
       const title = `${post.title} — ${config.name}`;
-      await writeFile(at('dist/writings', `${post.slug}.html`), render({ slug: `writings/${post.slug}`, title, content }));
+      await writeFile(at('dist/musings', `${post.slug}.html`), render({ slug: `musings/${post.slug}`, title, content }));
     }
     const list = posts
-      .map((p) => `<li><a href="${base}/writings/${p.slug}">${marked.parseInline(p.title)}</a> <time datetime="${p.iso}">${p.shown}</time></li>`)
+      .map((p) => `<li><a href="${base}/musings/${p.slug}">${marked.parseInline(p.title)}</a> <time datetime="${p.iso}">${p.shown}</time></li>`)
       .join('\n');
     await writeFile(
-      at('dist/writings/index.html'),
-      render({ slug: 'writings', title: `writings — ${config.name}`, content: `<ul class="posts">\n${list}\n</ul>` }),
+      at('dist/musings/index.html'),
+      render({ slug: 'musings', title: `musings — ${config.name}`, content: `<ul class="posts">\n${list}\n</ul>` }),
     );
   }
 

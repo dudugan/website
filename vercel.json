@@ -3,5 +3,17 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/writings",
+      "destination": "/musings",
+      "permanent": true
+    },
+    {
+      "source": "/writings/:slug",
+      "destination": "/musings/:slug",
+      "permanent": true
+    }
+  ]
 }

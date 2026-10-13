@@ -6,6 +6,18 @@ Working assumptions that haven't been approved yet stay in [PLAN.md](PLAN.md) un
 
 ---
 
+## 2026-10-13: "writings" is now "musings"
+
+### Decided by you
+- **The writings page is renamed "musings".**
+  - The nav label is now "musings".
+  - Pages move from `/writings` to `/musings`.
+  - The folder is now `content/musings/`.
+
+### Proposed by Claude while building (tell me if you want any of these changed)
+- **Old `/writings/...` links redirect to `/musings/...` on Vercel.** GitHub Pages can't redirect, so they 404 there.
+- **The word "writings" inside your posts' own text is unchanged.**
+
 ## 2026-10-13: sick days in the habit tracker
 
 ### Decided by you

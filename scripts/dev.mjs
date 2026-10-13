@@ -41,7 +41,7 @@ async function isFile(path) {
   }
 }
 
-// Mirrors GitHub Pages / Vercel cleanUrls: /now -> now.html, /writings -> writings/index.html.
+// Mirrors GitHub Pages / Vercel cleanUrls: /now -> now.html, /musings -> musings/index.html.
 async function resolve(urlPath) {
   const clean = normalize(decodeURIComponent(urlPath)).replace(/^(\.\.[/\\])+/, '');
   const candidates = clean.endsWith('/') ? [join(clean, 'index.html')] : [clean, `${clean}.html`, join(clean, 'index.html')];

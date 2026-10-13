@@ -23,7 +23,7 @@ website/
 │   ├── now.md               → /now
 │   ├── past-lives.md        → /past-lives
 │   ├── influences.md        → /influences
-│   └── writings/            → /writings (the list) and /writings/<slug> (each post)
+│   └── musings/             → /musings (the list) and /musings/<slug> (each post)
 ├── site.config.json         ← name, description, nav order, the 5 external links
 ├── src/
 │   ├── layout.html          ← the ONLY html file in the source (the build enforces this)
@@ -104,7 +104,7 @@ website/
 28g. `[x]` Any heading a page links to (`[music](#music)`) is built as a folded section. It stays hidden until its link is clicked, and only one is open at a time. The address updates (`/past-lives#music`), so a section can be linked to directly. Without JS, every section shows. This is used on /past-lives.
 
 ### Phase 9c: Writings
-28d. `[x]` Posts are `content/writings/YYYY-MM-DD-slug.md`, with the first `# heading` as the title. The build writes one page per post plus a newest-first list at `/writings`, and "writings" is in the nav. There are two example posts.
+28d. `[x]` Posts are `content/musings/YYYY-MM-DD-slug.md`, with the first `# heading` as the title. The build writes one page per post plus a newest-first list at `/musings`, and "musings" is in the nav (renamed from "writings"). There are two example posts.
 
 ### Phase 9d: Habit tracker
 28e. `[x]` `content/habits.json` holds the habits: name, colour, max-gap, and the days done. One renderer (`src/js/habits.js`) draws it at build time and again in the browser, so the rightmost column is always today.
