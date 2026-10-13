@@ -31,7 +31,7 @@ npm run images   # fetch pictures for new links on /influences (macOS; keeps exi
 
 ## Habit tracker
 
-Each habit in `content/habits.json` has:
+`content/habits.json` has a `"sick"` list of dates. In edit mode, long-pressing any square adds or removes that day. Its unfilled squares turn pastel red, and streaks hold through it. Each habit in `content/habits.json` has:
 - a `name`
 - a `color`: one of `teal`, `purple`, `ember`, `green`, `gold`, or `blue`
 - a `max-gap`: how many days in a row you can miss before the streak breaks

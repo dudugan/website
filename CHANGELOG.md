@@ -6,6 +6,17 @@ Working assumptions that haven't been approved yet stay in [PLAN.md](PLAN.md) un
 
 ---
 
+## 2026-10-13: sick days in the habit tracker
+
+### Decided by you
+- **Long-press a square in edit mode to mark that whole day sick.** Long-press again to unmark it.
+- **On a sick day, squares that would otherwise be empty are solid pastel red (#9a4f4f)**, at the same strength as the habit colours. Done squares keep their colour, and a sick day inside a streak keeps the streak's dimmer shade. Hovering any square that day says "sick". (A red glow came first, then was dropped.)
+- **Streaks hold through sick days.** A sick day doesn't count as a missed day toward max-gap.
+
+### Proposed by Claude while building (tell me if you want any of these changed)
+- **Sick days are stored in `habits.json`** as a top-level `"sick"` list of dates, so you can also edit them by hand.
+- **A long press is half a second.** Moving more than a few pixels cancels it, and it doesn't also toggle the square.
+
 ## 2026-10-03: collapsible sections on /now, fire-coloured code
 
 ### Decided by you

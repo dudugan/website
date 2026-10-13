@@ -1,4 +1,5 @@
 // Habit tracker: one row per habit, one small square per day, today at the right edge.
+// Sick days are pastel red, and streaks hold through them.
 // Done days are squares in the habit's colour; inside a streak (misses no longer than the
 // habit's max-gap) the missed days are squares in a dimmer shade of it. The same
 // renderer runs at build time (so the page works without JS) and in the browser (so the
@@ -18,6 +19,7 @@ export const PALETTES = {
   blue: { done: '#426395', gap: '#263040' },
 };
 
+const SICK = '#9a4f4f'; // a sick day: pastel red, as strong as the habits' own colours
 const S = 16; // square
 const GAP = 4;
 const STEP = S + GAP;
@@ -34,32 +36,41 @@ export const localToday = () => {
   return Date.UTC(t.getFullYear(), t.getMonth(), t.getDate()) / DAY;
 };
 
+const checkDates = (dates, where) => {
+  for (const d of dates) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || isoOf(dayOf(d)) !== d) throw new Error(`${where}: "${d}" isn't a YYYY-MM-DD date`);
+  }
+  return dates;
+};
+
 export function parseHabits(text) {
   const raw = JSON.parse(text);
   if (!Array.isArray(raw?.habits)) throw new Error('habits.json needs a "habits" list');
   return {
+    sick: checkDates([...new Set(raw.sick ?? [])].sort(), 'habits.json, "sick"'),
     habits: raw.habits.map((h, i) => {
       const where = `habits.json, habit ${i + 1}${h?.name ? ` (${h.name})` : ''}`;
       if (typeof h.name !== 'string' || !h.name) throw new Error(`${where}: needs a "name"`);
       if (!PALETTES[h.color]) throw new Error(`${where}: "color" must be one of ${Object.keys(PALETTES).join(', ')}`);
       const maxGap = h['max-gap'] ?? 1;
       if (!Number.isInteger(maxGap) || maxGap < 0) throw new Error(`${where}: "max-gap" must be a whole number`);
-      const done = [...new Set(h.done ?? [])].sort();
-      for (const d of done) {
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || isoOf(dayOf(d)) !== d) throw new Error(`${where}: "${d}" isn't a YYYY-MM-DD date`);
-      }
+      const done = checkDates([...new Set(h.done ?? [])].sort(), where);
       return { name: h.name, color: h.color, maxGap, done };
     }),
   };
 }
 
 // Written back by hand-editable rules: one habit per block, one month of dates per line.
-export function formatHabits({ habits }) {
+const dateList = (dates, indent) => {
+  const months = new Map();
+  for (const iso of [...dates].sort()) months.set(iso.slice(0, 7), [...(months.get(iso.slice(0, 7)) ?? []), iso]);
+  const lines = [...months.values()].map((ds) => `${indent}  ${ds.map((d) => JSON.stringify(d)).join(', ')}`);
+  return lines.length ? `[\n${lines.join(',\n')}\n${indent}]` : '[]';
+};
+
+export function formatHabits({ sick = [], habits }) {
   const blocks = habits.map((h) => {
-    const months = new Map();
-    for (const iso of [...h.done].sort()) months.set(iso.slice(0, 7), [...(months.get(iso.slice(0, 7)) ?? []), iso]);
-    const lines = [...months.values()].map((ds) => `        ${ds.map((d) => JSON.stringify(d)).join(', ')}`);
-    const done = lines.length ? `[\n${lines.join(',\n')}\n      ]` : '[]';
+    const done = dateList(h.done, '      ');
     return [
       '    {',
       `      "name": ${JSON.stringify(h.name)},`,
@@ -69,23 +80,29 @@ export function formatHabits({ habits }) {
       '    }',
     ].join('\n');
   });
-  return `{\n  "habits": [\n${blocks.join(',\n')}\n  ]\n}\n`;
+  return `{\n  "sick": ${dateList(sick, '  ')},\n  "habits": [\n${blocks.join(',\n')}\n  ]\n}\n`;
 }
 
-function streaksOf(days, maxGap, today) {
+// Sick days don't count as missed: a streak holds through them.
+function streaksOf(days, maxGap, today, sick = new Set()) {
+  const missed = (from, to) => {
+    let n = 0;
+    for (let d = from + 1; d < to; d++) if (!sick.has(d)) n++;
+    return n;
+  };
   const out = [];
   for (const d of days) {
     const s = out.at(-1);
-    if (s && d - s.end - 1 <= maxGap) s.end = d;
+    if (s && missed(s.end, d) <= maxGap) s.end = d;
     else out.push({ start: d, end: d });
   }
   for (const s of out) s.to = s.end;
   const last = out.at(-1);
-  if (last && today - last.end - 1 <= maxGap) last.to = today; // still alive: today can carry it on
+  if (last && missed(last.end, today) <= maxGap) last.to = today; // still alive: today can carry it on
   return out;
 }
 
-export function renderTracker({ habits }, today) {
+export function renderTracker({ habits, sick = [] }, today) {
   const days = habits.map((h) => h.done.map(dayOf).filter((d) => d <= today));
   const first = Math.min(today, ...days.flat());
   const start = Math.min(first - 7, today - 83); // at least 12 weeks to scroll through
@@ -94,17 +111,20 @@ export function renderTracker({ habits }, today) {
   const h = Math.max(1, habits.length) * STEP - GAP;
   const x = (d) => (d - start) * STEP;
 
+  // Sick days: squares that would otherwise be empty are a solid pastel red, and streaks hold
+  // through them (a sick day inside a streak keeps the streak's shade).
+  const sickDays = new Set(sick.map(dayOf).filter((d) => d >= start && d <= today));
   const body = [`<rect width="${w}" height="${h}" fill="url(#habit-off)"/>`];
   habits.forEach((habit, r) => {
     const y = r * STEP;
     const colours = PALETTES[habit.color];
     const done = new Set(days[r]);
-    for (const s of streaksOf(days[r], habit.maxGap, today)) {
-      for (let d = s.start; d <= s.to; d++) {
-        const fill = done.has(d) ? colours.done : colours.gap;
-        body.push(`<rect x="${x(d)}" y="${y}" width="${S}" height="${S}" rx="${R}" fill="${fill}"/>`);
-      }
+    const fills = new Map([...sickDays].map((d) => [d, SICK]));
+    for (const s of streaksOf(days[r], habit.maxGap, today, sickDays)) {
+      for (let d = s.start; d <= s.to; d++) fills.set(d, colours.gap); // inside a streak: its shade, sick or not
     }
+    for (const d of done) fills.set(d, colours.done);
+    for (const [d, fill] of fills) body.push(`<rect x="${x(d)}" y="${y}" width="${S}" height="${S}" rx="${R}" fill="${fill}"/>`);
   });
 
   const off = `<pattern id="habit-off" width="${STEP}" height="${STEP}" patternUnits="userSpaceOnUse"><rect width="${S}" height="${S}" rx="${R}" fill="#171717"/></pattern>`;
@@ -166,11 +186,28 @@ function mount() {
 
   const scroller = fig.querySelector('.habits-scroll');
   let drag = null;
+  // Editing: a long press marks the whole day sick (or not), instead of toggling one square.
+  let press = null;
+  let pressed = false;
+  const cancelPress = () => {
+    clearTimeout(press?.timer);
+    press = null;
+  };
   scroller.addEventListener('pointerdown', (e) => {
     showCell(e);
+    pressed = false;
     if (e.pointerType === 'mouse' && e.button === 0) drag = { x: e.clientX, left: scroller.scrollLeft, moved: false };
+    cancelPress();
+    if (fig.classList.contains('editing') && e.button === 0) {
+      const at = { clientX: e.clientX, clientY: e.clientY };
+      press = { x: e.clientX, y: e.clientY, timer: setTimeout(() => ((pressed = true), (press = null), toggleSick(at)), 500) };
+    }
   });
+  scroller.addEventListener('pointerup', cancelPress);
+  scroller.addEventListener('pointercancel', cancelPress);
+  scroller.addEventListener('contextmenu', (e) => fig.classList.contains('editing') && e.preventDefault());
   scroller.addEventListener('pointermove', (e) => {
+    if (press && Math.hypot(e.clientX - press.x, e.clientY - press.y) > 6) cancelPress();
     if (drag && e.buttons === 1) {
       const dx = e.clientX - drag.x;
       if (Math.abs(dx) > 4) drag.moved = true;
@@ -182,6 +219,7 @@ function mount() {
   scroller.addEventListener('click', (e) => {
     const dragged = drag?.moved;
     drag = null;
+    if (pressed) return void (pressed = false); // the long press already did its work
     if (!dragged) toggle(e);
   });
 
@@ -213,7 +251,8 @@ function cellAt(e) {
 function showCell(e) {
   const cell = cellAt(e);
   const [name, date] = fig.querySelectorAll('.habits-info span');
-  name.textContent = cell ? store.data.habits[cell.row].name : '';
+  const sick = cell && store.data.sick?.includes(isoOf(cell.day));
+  name.textContent = cell ? (sick ? 'sick' : store.data.habits[cell.row].name) : '';
   date.textContent = cell
     ? new Date(cell.day * DAY).toLocaleDateString('en-US', { month: 'long', day: 'numeric', timeZone: 'UTC' })
     : '';
@@ -250,9 +289,30 @@ function toggle(e) {
   store.timer = setTimeout(save, 1500); // one commit per burst of clicks
 }
 
+function toggleSick(e) {
+  if (!store.token || !fig.classList.contains('editing')) return;
+  const cell = cellAt(e);
+  if (!cell) return;
+  const iso = isoOf(cell.day);
+  store.data.sick ??= [];
+  const sick = !store.data.sick.includes(iso);
+  store.data.sick = sick ? [...store.data.sick, iso].sort() : store.data.sick.filter((d) => d !== iso);
+  store.ops.set(JSON.stringify([null, iso]), sick); // a null name means the day itself
+  draw(false);
+  showCell(e);
+  status('unsaved');
+  clearTimeout(store.timer);
+  store.timer = setTimeout(save, 1500);
+}
+
 function applyOps(data, ops) {
   for (const [key, done] of ops) {
     const [name, iso] = JSON.parse(key);
+    if (name === null) {
+      data.sick = (data.sick ?? []).filter((d) => d !== iso);
+      if (done) data.sick = [...data.sick, iso].sort();
+      continue;
+    }
     const habit = data.habits.find((h) => h.name === name);
     if (!habit) continue; // renamed or removed in the file meanwhile
     habit.done = habit.done.filter((d) => d !== iso);

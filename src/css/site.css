@@ -304,6 +304,10 @@ main a[aria-expanded='true'] {
 .habits.editing .habits-grid {
   cursor: pointer;
 }
+.habits.editing .habits-scroll {
+  -webkit-touch-callout: none; /* long press marks a sick day, not a phone's callout menu */
+  user-select: none;
+}
 .habits-info {
   display: flex;
   justify-content: space-between;
