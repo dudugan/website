@@ -10,6 +10,10 @@ I've also been in some way connected to the [Tbilisi Zoo](http://www.zoo.ge/inde
 
 **Garsten, David\***, Anton Hampe\*, and Adriana Zhou\*. Accepted, 2026. *Inferring complexity of animal communication systems from small samples*. International Conference on Grammatical Inference (talk). \*Equal contribution.
 
+**Garsten, David**. In revision, 2026. *It's Giving Nonfactive Small Clause Selection*. Journal of Comparative Germanic Linguistics.
+
+**Garsten, David**. 2026. *Appl's got gravity: head movement, have-raising, and the evolution of (have) got*. Proceedings of Chicago Linguistics Society 2026.
+
 **Garsten, David**. 2026. *Appl's got gravity: head movement, have-raising, and the evolution of (have) got*. Chicago Linguistics Society 2026. (talk, [handout here](https://dudugan.github.io/media/documents/handout.pdf)).
 
 **Garsten, David**. 2026. *It's Giving Nonfactive Small Clause Selection*. Yale Undergraduate Research Conference ([poster here](https://dudugan.github.io/#404)).
