@@ -1,6 +1,6 @@
 # Reflecting on clearly good and clearly bad decisions I made in college
 
-*Feels important to note, if anyone somehow happens upon this post, that the writings here so far are really unpolished musings that I don't yet want to post on Substack. They will lean unpolished.*
+*Feels important to note, if anyone somehow happens upon this post, that the writings here so far are really just low-effort musings that I don't yet want to post on Substack. They will lean unpolished.*
 
 Clearly good decisions:
 - taking Swahili
@@ -8,7 +8,7 @@ Clearly good decisions:
 - submitting papers to linguistics conferences
 - deciding to live at home
 - dropping clubs
-- transitioning to AI safety
+- transitioning to AI safety and doing YAIA
 
 Clearly bad decisions:
 - not taking a YEA leadership position when the upperclassmen I knew faded
