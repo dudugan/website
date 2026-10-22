@@ -6,8 +6,8 @@
   "links": [
     { "label": "overworld", "url": "https://dudugan.github.io" },
     { "label": "linkedin", "url": "https://www.linkedin.com/in/david-garsten-310815286/" },
-    { "label": "newsletter", "url": "https://dudugan.substack.com" },
-    { "label": "substack", "url": "https://friedgrice.substack.com" },
+    { "label": "substack", "url": "https://substack.com/@dudugan" },
+    { "label": "career memo", "url": "https://docs.google.com/document/d/1sDzVc2Zd6LRwlyMfJ2L9NR2dJga6oql_bSXncEbJPFY/edit?usp=sharing" },
     { "label": "resume", "url": "https://dudugan.github.io/media/documents/resume.pdf" },
     { "label": "email", "url": "mailto:duzugan@gmail.com" }
   ]
