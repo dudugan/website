@@ -12,7 +12,7 @@ Clearly good decisions:
 
 Clearly bad decisions:
 - not taking a YEA leadership position when the upperclassmen I knew faded
-- not trying to start YAIA when Neav Topaz emailed about it
+- not trying to start YAIA when Neav Topaz emailed me about it
 - agreeing to be Amoriem Labs writing lead
 - being Cortex head a second year in a row
 
