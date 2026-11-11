@@ -6,6 +6,12 @@ Working assumptions that haven't been approved yet stay in [PLAN.md](PLAN.md) un
 
 ---
 
+## 2026-11-11: quotes page (hidden); musings hidden
+
+### Decided by you
+- **A new "quotes" page exists but is hidden from the nav for now.** It's `content/quotes.md`, blank for you to fill. Add `"quotes"` after `"influences"` in `site.config.json`'s nav to show it.
+- **"musings" is gone from the nav.** The posts are still in `content/musings/`, and the pages are still built at `/musings`, so existing links keep working.
+
 ## 2026-10-13: "writings" is now "musings"
 
 ### Decided by you

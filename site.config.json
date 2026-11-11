@@ -2,7 +2,7 @@
   "name": "David Garsten",
   "description": "A biolinguistics student working on AI safety.",
   "repo": "dudugan/website",
-  "nav": ["now", "past-lives", "influences", "musings"],
+  "nav": ["now", "past-lives", "influences"],
   "links": [
     { "label": "overworld", "url": "https://dudugan.github.io" },
     { "label": "linkedin", "url": "https://www.linkedin.com/in/david-garsten-310815286/" },
