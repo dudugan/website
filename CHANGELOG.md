@@ -6,6 +6,23 @@ Working assumptions that haven't been approved yet stay in [PLAN.md](PLAN.md) un
 
 ---
 
+## 2026-11-25: text edits and more /influences pictures
+
+### Decided by you
+- **Text edits:**
+  - **Home:** "...and computational alien linguistics (kind of)."
+  - **/now:** two new bullets ("Writing a substack post every day for a month." first, "Thinking about GRAFT, …" last), last updated 11/25/26, and Princeton removed from locations.
+  - **/past-lives:** the Supervised Program for Alignment Research (sparai.org) is added after BlueDot Impact.
+  - **/influences:**
+    - New friends: Shubs Debsarkar, Feifan Liu, Eliana Du (elianadu.com), and Jesse Angrist.
+    - Eliana Du is off the blogs list, which now ends "and Noah Smith".
+    - "certain popular blogs".
+    - The girlfriend clause is removed.
+    - Alvin Ashiatey is removed.
+- **New /influences pictures:**
+  - Yours: Bar Tzabary, Dudu Tassa, Ariel Mayse, Becky Voorwinde, Julian Schlusberg, Matthew Suttor, Ross Wightman, Kathryn Alexander, and Yassine Benzinane.
+  - The Rabbi's Cat, from its Wikipedia poster.
+
 ## 2026-11-11: quotes page (hidden); musings hidden
 
 ### Decided by you
